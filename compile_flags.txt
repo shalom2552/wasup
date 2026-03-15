@@ -1,0 +1,8 @@
+-Iinc
+-Iinc/adt
+-Wall
+-Wextra
+-Werror
+-pedantic
+-std=c++17
+-Wno-unused-includes
