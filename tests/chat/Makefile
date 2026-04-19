@@ -8,6 +8,8 @@ OBJ = $(SRC_C:.c=.o) $(SRC_CPP:.cpp=.o)
 
 TRG_SERVER = run_server
 TRG_CLIENT = run_client
+OBJ_SERVER = run_server.o
+OBJ_CLIENT = run_client.o
 
 all: $(TRG_SERVER) $(TRG_CLIENT)
 
@@ -24,6 +26,6 @@ $(TRG_CLIENT): $(TRG_CLIENT).o $(OBJ)
 	gcc $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(TRG_SERVER) $(TRG_CLIENT) $(OBJ)
+	$(RM) $(OBJ) $(TRG_SERVER) $(TRG_CLIENT) $(OBJ_SERVER) $(OBJ_CLIENT)
 
 .PHONY: clean all

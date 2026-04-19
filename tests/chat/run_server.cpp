@@ -2,8 +2,10 @@
 #include "chat/server.h"
 #include "chat/utils.h"
 
+#include <signal.h>		// SIGINT
 
 int main (int argc, char *argv[]) {
+	signal(SIGINT, handle_sigint);
 	print_welcome_message();
 
 	// setup listiner
@@ -13,6 +15,8 @@ int main (int argc, char *argv[]) {
 		print_error("Setup failed.");
 		return 1;
 	}
+
+	G_SOCKFD = listen_fd; // to close on trap sigint
 
 	print_info("Server is listening...");
 

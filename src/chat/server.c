@@ -39,6 +39,12 @@ int chat_server_setup(const char* port)
 		return -1;
 	}
 
+	// allow address reuse
+	int opt = 1;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+        print_error("Warning: Port reuse failed."); // non-fatal error
+    }
+
 	// bind
 	if (bind(sockfd, res->ai_addr, res->ai_addrlen) == -1) {
 		print_error("Error(bind): Could not bind socket to port.");
@@ -74,7 +80,20 @@ int chat_accept_client(int listen_sockfd)
 
 void chat_run_server(int client_fd)
 {
+	char username[UNAME_SIZE];
+	char peername[UNAME_SIZE];
 	char buffer[2048];
+
+	// get username
+	if ( !get_user_name(username, sizeof(username)) ) {
+		print_error("Failed to get username. exiting.");
+		return;
+	}
+	exchange_user_names(client_fd, username, peername);
+
+	// start chat
+	print_info("Chat started!");
+	print_chat_top_box();
 	while (1) {
 
 		// recive from client
@@ -92,20 +111,18 @@ void chat_run_server(int client_fd)
 
 		// terminate with end string
 		buffer[bytes] = '\0';
-		print_client_message(buffer);
+		print_chat_message(peername, buffer);
 
-		// server reply
-		print_chat_prompt();
-		if ( !fgets(buffer, sizeof(buffer), stdin) ) {
-		print_error("Error(stdin): System error while reading from stdin.");
-			break;
-		}
+		// get input message
+		do {
+			print_chat_prompt(username);
+			if ( !fgets(buffer, sizeof(buffer), stdin) ) {
+				print_error("Error(stdin): System error while reading from stdin.");
+				break;
+			}
 
-		// terminate new line from message
-		buffer[strcspn(buffer, "\n")] = 0;
-		if (strlen(buffer) == 0) {
-			continue;  // skip empty sends
-		}
+			buffer[strcspn(buffer, "\n")] = 0; // remove new line
+		} while (strlen(buffer) == 0);
 
 		// trap server exit message
 		if (chat_exit_messege(buffer)) {
@@ -114,6 +131,7 @@ void chat_run_server(int client_fd)
 		}
 		send(client_fd, buffer, strlen(buffer), 0);
 	}
+	print_chat_bottom_box();
 	print_info("Chat ended.");
 }
 
