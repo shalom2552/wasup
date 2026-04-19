@@ -4,5 +4,10 @@
 -Wextra
 -Werror
 -pedantic
--std=c++17
 -Wno-unused-includes
+
+
+If:
+    PathMatch: .*\.cpp
+CompileFlags:
+    -std=c++17
