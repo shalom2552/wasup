@@ -32,6 +32,9 @@ void print_server_message(const char* msg);
 /* print a prompt to user to type message */
 void print_chat_prompt(void);
 
+/* terminate fd connection */
+void chat_disconnect(int fd);
+
 #ifdef __cplusplus
 }
 #endif // !__cplusplus

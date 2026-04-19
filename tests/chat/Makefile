@@ -2,15 +2,20 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -g
 CFLAGS   = -std=c99 -Wall -Wextra -pedantic -g
 CPPFLAGS += -I../../inc
 
-SRC_CPP = main.cpp $(wildcard ../../src/chat/*.cpp)
+SRC_CPP = $(wildcard ../../src/chat/*.cpp)
 SRC_C = $(wildcard ../../src/chat/*.c)
-OBJ = $(addsuffix .o, $(basename $(SRC_CPP) $(SRC_C)))
-TRG = chat
+OBJ = $(SRC_C:.c=.o) $(SRC_CPP:.cpp=.o)
 
-all: $(TRG)
+TRG_SERVER = run_server
+TRG_CLIENT = run_client
 
-$(TRG): $(OBJ)
-	g++ -o $(TRG) $(OBJ)
+all: $(TRG_SERVER) $(TRG_CLIENT)
+
+$(TRG_SERVER): $(TRG_SERVER).o $(OBJ)
+	g++ -o $(TRG_SERVER) $^
+
+$(TRG_CLIENT): $(TRG_CLIENT).o $(OBJ)
+	g++ -o $(TRG_CLIENT) $^
 
 %.o: %.cpp
 	g++ $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
@@ -19,6 +24,6 @@ $(TRG): $(OBJ)
 	gcc $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(TRG) $(OBJ)
+	$(RM) $(TRG_SERVER) $(TRG_CLIENT) $(OBJ)
 
 .PHONY: clean all

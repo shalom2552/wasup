@@ -3,6 +3,7 @@
 
 #include <stdio.h>		// printf(), fprintf
 #include <string.h>		// strncmp()
+#include <unistd.h>		// close()
 
 void clear_screen(void)
 {
@@ -75,5 +76,12 @@ void print_server_message(const char* msg)
 void print_chat_prompt(void)
 {
 	printf("%sType message:%s ", C_NC, C_NC);
+}
+
+void chat_disconnect(int fd)
+{
+	if (fd != -1) {
+		close(fd);
+	}
 }
 

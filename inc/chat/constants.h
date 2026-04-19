@@ -1,7 +1,11 @@
 #ifndef CHAT_CONSTANTS_H
 #define CHAT_CONSTANTS_H
 
-/* clear screen */
+// connection
+static const char* const DEFAULT_PORT = "1313";
+static const char* const LOCAL_HOST   = "127.0.0.1";
+
+// clear screen
 static const char* const ANSI_CLEAR = "\033[H\033[2J\033[3J";
 
 // colors

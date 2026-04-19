@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200112L
 #include "chat/server.h"
 #include "chat/utils.h"
+#include "chat/constants.h"
 
 #include <sys/socket.h>		// socket(), bind(), listen(), accept(), setsockopt()
 #include <netdb.h>			// getaddrinfo(), struct addrinfo
@@ -8,8 +9,6 @@
 #include <stdbool.h>		// bool
 #include <unistd.h>			// close()
 #include <stdio.h>			// fgets(), stdin
-
-const char* DEFAULT_PORT = "1313";
 
 int chat_server_setup(const char* port)
 {
@@ -37,7 +36,6 @@ int chat_server_setup(const char* port)
 	if (sockfd == -1) {
 		print_error("Error(socket): Could not create socket.");
 		freeaddrinfo(res);
-		res = NULL;
 		return -1;
 	}
 
@@ -46,7 +44,6 @@ int chat_server_setup(const char* port)
 		print_error("Error(bind): Could not bind socket to port.");
 		close(sockfd);
 		freeaddrinfo(res);
-		res = NULL;
 		return -1;
 	}
 
@@ -120,9 +117,3 @@ void chat_run_server(int client_fd)
 	print_info("Chat ended.");
 }
 
-void chat_disconnect(int fd)
-{
-	if (fd != -1) {
-		close(fd);
-	}
-}

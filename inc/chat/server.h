@@ -21,14 +21,12 @@ int chat_server_setup(const char* port);
  */
 int chat_accept_client(int listen_sockfd);
 
-/* TODO: */
-void chat_run_server(int client_fd);
-
 /**
- * @brief terminate connection
- * @param fd file descriptor
+ * @brief Run chat loop.
+ * recive -> display -> read -> send
+ * @param client_fd The active socket fd
  */
-void chat_disconnect(int fd);
+void chat_run_server(int client_fd);
 
 #ifdef __cplusplus
 }

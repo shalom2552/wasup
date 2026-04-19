@@ -1,14 +1,13 @@
+#include "chat/constants.h"
 #include "chat/server.h"
 #include "chat/utils.h"
-#include <stdio.h>
 
 
 int main (int argc, char *argv[]) {
-
 	print_welcome_message();
 
 	// setup listiner
-	const char* port = (argc > 1) ? argv[1] : NULL;
+	const char* port = (argc > 1) ? argv[1] : DEFAULT_PORT;
 	int listen_fd = chat_server_setup(port);
 	if (listen_fd < 0) {
 		print_error("Setup failed.");
@@ -16,7 +15,6 @@ int main (int argc, char *argv[]) {
 	}
 
 	print_info("Server is listening...");
-
 
 	// wait for client connection
 	int client_fd = chat_accept_client(listen_fd);
