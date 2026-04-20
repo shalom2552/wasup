@@ -52,28 +52,24 @@ void print_logo(void)
 		C_GREEN, C_CYAN, C_GREEN, C_GREEN,
 		C_GREEN, C_CYAN, C_GREEN, C_GREEN,
 		C_GREEN, C_GREEN,
-		C_GREEN, C_YELLO, VERSION_NO, C_GREEN, C_GREEN,
+		C_GREEN, C_YELLOW, CHAT_VERSION_NO, C_GREEN, C_GREEN,
 		C_GREEN, C_NC
 		);
 }
 
-void print_error(const char * msg)
+void log_error(const char * msg)
 {
 	fprintf(stderr, "%s[ERROR] %s%s\n", C_RED, C_NC, msg);
 }
 
-void print_info(const char * msg)
+void log_warn(const char * msg)
 {
-	printf("%s[INFO] %s%s\n", C_CYAN, C_NC, msg);
+	printf("%s[WARN] %s%s\n", C_YELLOW, C_NC, msg);
 }
 
-int chat_exit_messege(const char* msg)
+void log_info(const char * msg)
 {
-	if (strstr(msg, "/exit") || strstr(msg, "/quit") || strstr(msg, "/q"))
-	{
-		return 1;
-	}
-	return 0;
+	printf("%s[INFO] %s%s\n", C_CYAN, C_NC, msg);
 }
 
 void print_chat_message(const char* username, const char* msg)
@@ -89,16 +85,9 @@ void print_chat_prompt(const char* username)
     // Format: [HH:MM:SS] username ❯
 	printf("%s%s%s%s %s❯%s ",
         C_BOLD, C_CYAN, username, C_NC,
-        C_YELLO, C_NC);
+        C_YELLOW, C_NC);
 
     fflush(stdout);
-}
-
-void chat_disconnect(int fd)
-{
-	if (fd != -1) {
-		close(fd);
-	}
 }
 
 void print_current_time(const char* color)
@@ -117,14 +106,14 @@ void print_current_time(const char* color)
 int get_user_name(char* out_name, size_t size)
 {
 	printf("%s%s[CHAT]%s Enter user name %s❯%s ",
-           C_YELLO, C_BOLD, C_NC,
-           C_YELLO, C_NC);
+           C_YELLOW, C_BOLD, C_NC,
+           C_YELLOW, C_NC);
     fflush(stdout);
 	fflush(stdout);
 
 	if ( !fgets(out_name, size, stdin) ) {
-	print_error("Error(stdin): System error while reading from stdin.");
-		return 0;
+		log_error("Error(stdin): System error while reading from stdin.");
+		return 1;
 	}
 
 	// clean new line
@@ -135,18 +124,18 @@ int get_user_name(char* out_name, size_t size)
 		strncpy(out_name, "Anonymous", size);
 	}
 
-	return 1; // Success
+	return 0; // Success
 }
 
 void exchange_user_names(int fd, char* username, char* peername)
 {
-	send(fd, username, UNAME_SIZE, 0);
-	recv(fd, peername, UNAME_SIZE, 0);
+	send(fd, username, CHAT_USER_NAME_SIZE, 0);
+	recv(fd, peername, CHAT_USER_NAME_SIZE, 0);
 }
 
 void print_chat_top_box(void)
 {
-	printf(C_YELLO);
+	printf(C_YELLOW);
 	printf(" %s", CBOX_TPLT);
 	for (int i = 0; i < CBOX_WIDTH; ++i) {
 		printf("%s", CBOX_HRZL);
@@ -158,19 +147,19 @@ void print_chat_top_box(void)
 
 void print_chat_left_box(void)
 {
-	printf(C_YELLO);
+	printf(C_YELLOW);
 	printf(" %s ", CBOX_LEFT);
 	printf(C_NC);
 }
 
 void print_chat_bottom_box(void)
 {
-	printf(C_YELLO);
+	printf(C_YELLOW);
 	printf(" %s", CBOX_BTLT);
 	for (int i = 0; i < CBOX_WIDTH; ++i) {
 		printf("%s", CBOX_HRZL);
 	}
-	printf("%s", CBOX_BTRG);
+	printf("%s", CBOX_BTRT);
 	printf("%s\n", C_NC);
 }
 

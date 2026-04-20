@@ -9,7 +9,6 @@ extern "C" {
  * @brief Set up socket
  * @param ip The
  * @param port To setup on
- *  If port is NULL use DEFAULT_PORT="1313"
  * @return the socketid or -1 on error
  * */
 int chat_client_setup(const char* ip, const char* port);

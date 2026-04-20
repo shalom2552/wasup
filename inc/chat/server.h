@@ -8,18 +8,11 @@ extern "C" {
 #include <stdbool.h>
 
 /**
- * @brief Set up socket
+ * @brief Set up Server and listen
  * @param port to setup on
- *  If port is NULL use DEFAULT_PORT="1313"
  * @return the socketid or -1 on error
  * */
 int chat_server_setup(const char* port);
-
-/**
- * @brief waits for client connection
- * @param listen_sockfd
- */
-int chat_accept_client(int listen_sockfd);
 
 /**
  * @brief Run chat loop.

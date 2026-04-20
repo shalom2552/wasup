@@ -22,22 +22,19 @@ void print_welcome_message(void);
 void print_logo(void);
 
 /* print error messge */
-void print_error(const char * msg);
+void log_error(const char * msg);
+
+/* print warning messge */
+void log_warn(const char * msg);
 
 /* print error messge */
-void print_info(const char * msg);
-
-/* return 1 if msg is [/exit|/quit|/q] or 0 otherwise */
-int chat_exit_messege(const char* msg);
+void log_info(const char * msg);
 
 /* print a messge to the screen */
 void print_chat_message(const char* username, const char* msg);
 
 /* print a prompt to user to type message */
 void print_chat_prompt(const char* username);
-
-/* terminate fd connection */
-void chat_disconnect(int fd);
 
 /* print the current time in a given color */
 void print_current_time(const char* color);
