@@ -15,6 +15,7 @@ static int send_bytes(int fd, const char* buffer, size_t len);
 
 int chat_get_input_message(char *buffer)
 {
+	print_chat_prompt("usname");
 	do { // repeat on empty input
 		if ( !fgets(buffer, CHAT_MSG_BUFFER_SIZE, stdin) ) {
 			log_error("Error(stdin): System error while reading from stdin.");
@@ -89,4 +90,14 @@ void chat_disconnect(int fd)
 	if (fd != -1) {
 		close(fd);
 	}
+}
+
+int chat_get_input_username(char *out, size_t size)
+{
+    return get_user_input("Enter user name", out, size, "Anonymous");
+}
+
+int chat_get_input_room(char *out, size_t size)
+{
+    return get_user_input("Enter room number", out, size, "1");
 }

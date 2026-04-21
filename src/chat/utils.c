@@ -1,6 +1,7 @@
 #include "chat/utils.h"
 #include "chat/constants.h"
 
+#include <stdarg.h>		// va_list
 #include <stdio.h>		// printf(), fprintf
 #include <string.h>		// strncmp()
 #include <stdlib.h>		// exit()
@@ -52,9 +53,14 @@ void print_logo(void)
 		);
 }
 
-void log_error(const char * msg)
+void log_error(const char * msg, ...)
 {
-	fprintf(stderr, "%s[ERROR] %s%s\n", C_RED, C_NC, msg);
+	va_list args;
+	va_start(args, msg);
+	printf("%s[ERROR]%s ", C_RED, C_NC);
+	vprintf(msg, args);
+	printf("\n");
+	va_end(args);
 }
 
 void log_warn(const char * msg)
@@ -67,8 +73,24 @@ void log_info(const char * msg)
 	printf("%s[INFO] %s%s\n", C_CYAN, C_NC, msg);
 }
 
-void print_chat_message(const char* username, const char* msg)
+void split_message(const char* raw_msg, char** username, char** msg)
 {
+    char *colon = strchr(raw_msg, ':');
+    if (!colon) {
+        *username = "";
+        *msg = (char *)raw_msg;
+        return;
+    }
+    *colon = '\0';
+    *username = (char *)raw_msg;
+    *msg = colon + 2;
+}
+
+void print_chat_message(const char* raw_msg)
+{
+	char* username;
+	char* msg;
+	split_message(raw_msg, &username, &msg);
 	print_current_time(C_GRAY);
 	printf("%s%s%s%s: %s\n", C_BOLD, C_GREEN, username, C_NC, msg);
 }
@@ -98,34 +120,22 @@ void print_current_time(const char* color)
 	printf("%s[%s]%s ", color, buffer, C_NC);
 }
 
-int get_user_name(char* out_name, size_t size)
+int get_user_input(const char *label, char *out, size_t size, const char *fallback)
 {
-	printf("%s%s[CHAT]%s Enter user name %s❯%s ",
-           C_YELLOW, C_BOLD, C_NC,
+    printf("%s%s[CHAT]%s %s %s❯%s ",
+           C_YELLOW, C_BOLD, C_NC, label,
            C_YELLOW, C_NC);
     fflush(stdout);
-	fflush(stdout);
-
-	if ( !fgets(out_name, size, stdin) ) {
-		log_error("Error(stdin): System error while reading from stdin.");
-		return 1;
-	}
-
-	// clean new line
-	out_name[strcspn(out_name, "\n")] = 0;
-
-	// set default name
-	if (strlen(out_name) == 0) {
-		strncpy(out_name, "Anonymous", size);
-	}
-
-	return 0; // Success
-}
-
-void exchange_user_names(int fd, char* username, char* peername)
-{
-	send(fd, username, CHAT_USER_NAME_SIZE, 0);
-	recv(fd, peername, CHAT_USER_NAME_SIZE, 0);
+    if (!fgets(out, size, stdin)) {
+        log_error("Error(stdin): System error while reading from stdin.");
+        return 1;
+    }
+    out[strcspn(out, "\n")] = 0;
+    if (strlen(out) == 0 && fallback) {
+        strncpy(out, fallback, size - 1);
+        out[size - 1] = '\0';
+    }
+    return 0;
 }
 
 void print_chat_top_box(void)

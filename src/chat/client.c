@@ -1,3 +1,4 @@
+#include <stdio.h>
 #define _POSIX_C_SOURCE 200112L
 #include "chat/client.h"
 #include "chat/utils.h"
@@ -13,9 +14,38 @@
 #include <poll.h>			// poll(), POLLIN, POLLHUP, POLLERR
 #include <errno.h>			// errno
 
+// TODO: Do we need Client struct? (used outside of setup?)
+static struct {
+	int fd;
+	char name[CHAT_USER_NAME_SIZE];
+} Client;
+
 int chat_client_setup(const char* ip, const char* port)
 {
-	return chat_tcp_connect(ip, port);
+	// connect
+	Client.fd = chat_tcp_connect(ip, port);
+	if (Client.fd < 0) {
+		log_error("Error(setup): Could not set up client conection.");
+		return -1;
+	}
+
+	// get user info
+	char room[CHAT_ROOM_SIZE];
+	if (chat_get_input_username(Client.name, sizeof(Client.name)) &&
+		chat_get_input_room(room, sizeof(room))) {
+		log_error("Could not get client info. Exiting.");
+		close(Client.fd);
+		return -1;
+	}
+
+	// handshake
+	char handshake[CHAT_USER_NAME_SIZE + CHAT_ROOM_SIZE];
+	snprintf(handshake, sizeof(handshake), "%s:%s", Client.name, room);
+	if (chat_send_all(Client.fd, handshake, strlen(handshake))) {
+		close(Client.fd);
+		return -1;
+	}
+	return Client.fd;
 }
 
 void chat_run_client(int server_fd)
@@ -45,7 +75,9 @@ void chat_run_client(int server_fd)
                 log_info("Server disconnected.");
                 break;
             }
-            print_chat_message("", buffer);
+			printf(ANSI_CLEAR_LINE);
+            print_chat_message(buffer);
+            print_chat_prompt(Client.name);
         }
 
         // send message
@@ -62,7 +94,6 @@ void chat_run_client(int server_fd)
         }
     }
 
-    print_chat_bottom_box();
     log_info("Chat ended.");
 }
 

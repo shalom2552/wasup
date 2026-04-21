@@ -24,6 +24,12 @@ int chat_trap_exit_message(const char* msg);
 /* terminate fd connection */
 void chat_disconnect(int fd);
 
+/* get username return 0 on failure */
+int chat_get_input_username(char *out, size_t size);
+
+/* get chat room return 0 on failure */
+int chat_get_input_room(char *out, size_t size);
+
 #ifdef __cplusplus
 }
 #endif // !__cplusplus

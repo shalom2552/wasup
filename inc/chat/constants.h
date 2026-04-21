@@ -13,11 +13,13 @@ extern "C" {
 enum ChatLimits {
 	CHAT_USER_NAME_SIZE  = 20,
 	CHAT_MSG_BUFFER_SIZE = 2048,
-	CHAT_MAX_CLIENTS	 = 16
+	CHAT_MAX_CLIENTS	 = 16,
+	CHAT_ROOM_SIZE		 = 8
 };
 
 // colors
 #define ANSI_CLEAR  "\033[H\033[2J\033[3J"	// clear screen
+#define ANSI_CLEAR_LINE  "\r\033[K"			// clear line
 #define C_CYAN	 "\033[36m"					// color cyan
 #define C_GREEN  "\033[32m"					// color green
 #define C_YELLOW "\033[33m"					// color yellow

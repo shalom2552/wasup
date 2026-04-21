@@ -19,7 +19,7 @@ int chat_server_setup(const char* port);
  * recive -> display -> read -> send
  * @param client_fd The active socket fd
  */
-void chat_run_server(int listen_fd);
+void chat_run_server(const int listen_fd);
 
 #ifdef __cplusplus
 }

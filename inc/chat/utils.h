@@ -22,7 +22,7 @@ void print_welcome_message(void);
 void print_logo(void);
 
 /* print error messge */
-void log_error(const char * msg);
+void log_error(const char * msg, ...);
 
 /* print warning messge */
 void log_warn(const char * msg);
@@ -30,20 +30,20 @@ void log_warn(const char * msg);
 /* print error messge */
 void log_info(const char * msg);
 
+/* prompt the user for info input like username or  room number */
+int get_user_input(const char *label, char *out, size_t size, const char *fallback);
+
+/* split username and message framed as username:msg */
+void split_message(const char* raw_msg, char** username, char** msg);
+
 /* print a messge to the screen */
-void print_chat_message(const char* username, const char* msg);
+void print_chat_message(const char* raw_msg);
 
 /* print a prompt to user to type message */
 void print_chat_prompt(const char* username);
 
 /* print the current time in a given color */
 void print_current_time(const char* color);
-
-/* get username return 0 on failure */
-int get_user_name(char* out_name, size_t size);
-
-/* exchange user names between peers */
-void exchange_user_names(int fd, char* username, char* peername);
 
 /* print the top border of the chat */
 void print_chat_top_box(void);
