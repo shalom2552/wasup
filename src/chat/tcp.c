@@ -2,9 +2,14 @@
 #include "chat/tcp.h"
 #include "chat/utils.h"
 
+#include <errno.h>			// errno
 #include <string.h>			// memset()
 #include <unistd.h>			// close()
 #include <netdb.h>			// getaddrinfo(), struct addrinfo
+#include <fcntl.h>			// fcntl()
+
+/* set non non-blocking flag to fd */
+static int set_nonblocking(int fd);
 
 int chat_tcp_bind(const char* port)
 {
@@ -26,16 +31,18 @@ int chat_tcp_bind(const char* port)
 	int sockfd = -1;
 	for (struct addrinfo* rp = res; rp != NULL; rp = rp->ai_next) {
 
-		// TODO: set non blocking soccket: SOCK_STREAM | SOCK_NONBLOCK
-		// int sockfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 		sockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
 		if (sockfd == -1) {
 			continue; // try next ai
 		}
 
+		if (set_nonblocking(sockfd) == -1) {
+			log_warn("Warning: Failed to set non-blocking."); // non-fatal
+		}
+
 		const int enable = 1;
 		if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) == -1) {
-			log_warn("Warning(socket): Port reuse failed."); // non-fatal error
+			log_warn("Warning(socket): Port reuse failed."); // non-fatal
 		}
 
 		if (bind(sockfd, rp->ai_addr, rp->ai_addrlen) == 0) {
@@ -63,9 +70,28 @@ int chat_tcp_accept(int listen_sockfd)
 
 	int client_fd = accept(listen_sockfd, (struct sockaddr*)&remote_addr, &add_size);
 	if (client_fd == -1) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
+			return -2; // no client wating
+		}
 		log_error("Error(accept): Failed to accept connection.");
 		return -1;
 	}
 
+	if (set_nonblocking(client_fd) == -1) {
+		log_warn("Warning: Failed to set non-blocking.");
+	}
+
 	return client_fd;
 }
+
+static int set_nonblocking(int fd)
+{
+	int flags = fcntl(fd, F_GETFL, 0);
+	if (flags == -1) {
+		return -1;
+	}
+
+	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+	return 0;
+}
+
