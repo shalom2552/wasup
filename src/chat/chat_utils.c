@@ -41,7 +41,7 @@ static int send_bytes(int fd, const char* buffer, size_t len)
 	return 0;
 }
 
-int chat_send_all(const int fd, char* buffer, size_t len)
+int chat_send_all(const int fd, const char* buffer, size_t len)
 {
 	if (send_bytes(fd, buffer, len) < 0) {
 		return -1;
@@ -75,17 +75,10 @@ int chat_recv_all(const int fd, char *buffer, size_t size)
 	return (int)total;
 }
 
-void chat_broadcast_message(const char* peername, char* msg)
-{
-	// TODO: broad cast to all peers
-	print_chat_message(peername, msg);
-}
-
 int chat_trap_exit_message(const char* msg)
 {
 	if (strstr(msg, "/exit") || strstr(msg, "/quit") || strstr(msg, "/q"))
 	{
-		log_info("Server exit the chat.");
 		return 1;
 	}
 	return 0;

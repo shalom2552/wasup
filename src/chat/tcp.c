@@ -11,6 +11,17 @@
 /* set non non-blocking flag to fd */
 static int set_nonblocking(int fd);
 
+static int set_nonblocking(int fd)
+{
+	int flags = fcntl(fd, F_GETFL, 0);
+	if (flags == -1) {
+		return -1;
+	}
+
+	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+	return 0;
+}
+
 int chat_tcp_bind(const char* port)
 {
 	struct addrinfo hints;
@@ -84,14 +95,35 @@ int chat_tcp_accept(int listen_sockfd)
 	return client_fd;
 }
 
-static int set_nonblocking(int fd)
+int chat_tcp_connect(const char *host, const char *port)
 {
-	int flags = fcntl(fd, F_GETFL, 0);
-	if (flags == -1) {
-		return -1;
+    struct addrinfo hints, *res;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+
+    if (getaddrinfo(host, port, &hints, &res)) {
+        log_error("Error(getaddrinfo): Could not get address info.");
+        return -1;
+    }
+
+    int sockfd = -1;
+    for (struct addrinfo *rp = res; rp; rp = rp->ai_next) {
+        sockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (sockfd == -1) {
+			continue; // try next ai
+		}
+        if (connect(sockfd, rp->ai_addr, rp->ai_addrlen) == 0) {
+			break; // success
+		}
+        close(sockfd);
+        sockfd = -1;
+    }
+
+    if (sockfd == -1) {
+		log_error("Error(connect): Could not connect.");
 	}
 
-	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-	return 0;
+	freeaddrinfo(res);
+    return sockfd;
 }
-

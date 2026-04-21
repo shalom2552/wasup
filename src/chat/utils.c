@@ -8,13 +8,8 @@
 #include <unistd.h>		// close()
 #include <time.h>		// time_t, struct tm, time(), localtime(), strftime()
 
-int G_SOCKFD = -1;
-
 void handle_sigint(int sig) {
-	if (G_SOCKFD != -1) {
-		close(G_SOCKFD);
-		printf("\n%sCaught signal %d. Server shut down.%s\n", C_RED, sig, C_NC);
-	}
+	printf("\n%sCaught signal %d. Server shut down.%s\n", C_RED, sig, C_NC);
     exit(0);
 }
 

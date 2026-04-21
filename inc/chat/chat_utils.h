@@ -10,14 +10,13 @@ extern "C" {
 /* prompt a user for a message and save to buffer */
 int chat_get_input_message(char* buffer);
 
-/* send a message and return 0 or -1 on error */
-int chat_send_all(const int fd, char* buffer, size_t len);
+/* send a message to fd, uses new line as framing rule.
+ * return 0 on success or -1 on error */
+int chat_send_all(const int fd, const char* buffer, size_t len);
 
-/* recive a message and return read size, 0 on peer close or -1 on error */
+/* recive a message from fd, uses new line as framing rule.
+ * return read size, 0 on peer close or -1 on error */
 int chat_recv_all(const int fd, char* buffer, size_t size);
-
-/* broad cast a recived message to all peers exept the sender */
-void chat_broadcast_message(const char* peername, char* msg);
 
 /* return 1 if msg is [/exit|/quit|/q] or 0 otherwise */
 int chat_trap_exit_message(const char* msg);

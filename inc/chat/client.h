@@ -6,11 +6,11 @@ extern "C" {
 #endif // !__cplusplus
 
 /**
- * @brief Set up socket
- * @param ip The
+ * @brief Set up server connection
+ * @param ip of the server
  * @param port To setup on
  * @return the socketid or -1 on error
- * */
+ */
 int chat_client_setup(const char* ip, const char* port);
 
 /**

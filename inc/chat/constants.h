@@ -12,7 +12,8 @@ extern "C" {
 
 enum ChatLimits {
 	CHAT_USER_NAME_SIZE  = 20,
-	CHAT_MSG_BUFFER_SIZE = 2048
+	CHAT_MSG_BUFFER_SIZE = 2048,
+	CHAT_MAX_CLIENTS	 = 16
 };
 
 // colors
