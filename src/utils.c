@@ -68,9 +68,14 @@ void log_warn(const char * msg)
 	printf("%s[WARN] %s%s\n", C_YELLOW, C_NC, msg);
 }
 
-void log_info(const char * msg)
+void log_info(const char * msg, ...)
 {
-	printf("%s[INFO] %s%s\n", C_CYAN, C_NC, msg);
+	va_list args;
+	va_start(args, msg);
+	printf("%s[INFO]%s ", C_CYAN, C_NC);
+	vprintf(msg, args);
+	printf("\n");
+	va_end(args);
 }
 
 void split_message(const char* raw_msg, char** username, char** msg)
@@ -83,7 +88,7 @@ void split_message(const char* raw_msg, char** username, char** msg)
     }
     *colon = '\0';
     *username = (char *)raw_msg;
-    *msg = colon + 2;
+    *msg = colon + 1;
 }
 
 void print_chat_message(const char* raw_msg)
@@ -135,6 +140,7 @@ int get_user_input(const char *label, char *out, size_t size, const char *fallba
         strncpy(out, fallback, size - 1);
         out[size - 1] = '\0';
     }
+	printf(ANSI_CLEAR_LINE);
     return 0;
 }
 

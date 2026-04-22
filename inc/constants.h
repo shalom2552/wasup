@@ -14,7 +14,8 @@ enum ChatLimits {
 	CHAT_USER_NAME_SIZE  = 20,
 	CHAT_MSG_BUFFER_SIZE = 2048,
 	CHAT_MAX_CLIENTS	 = 16,
-	CHAT_ROOM_SIZE		 = 8
+	CHAT_ROOM_SIZE		 = 8,
+	CHAT_MAX_ROOMS		 = 100
 };
 
 // colors
@@ -29,7 +30,7 @@ enum ChatLimits {
 #define C_NC	 "\033[0m"					// no color
 
 // chat box
-#define CBOX_WIDTH 60
+#define CBOX_WIDTH 45
 #define CBOX_LEFT  "┃"						// chat box left
 #define CBOX_HRZL  "━"    					// chat box middle
 #define CBOX_TPLT  "┏"    					// chat box top left

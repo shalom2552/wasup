@@ -28,7 +28,7 @@ void log_error(const char * msg, ...);
 void log_warn(const char * msg);
 
 /* print error messge */
-void log_info(const char * msg);
+void log_info(const char * msg, ...);
 
 /* prompt the user for info input like username or  room number */
 int get_user_input(const char *label, char *out, size_t size, const char *fallback);

@@ -14,7 +14,6 @@
 #include <poll.h>			// poll(), POLLIN, POLLHUP, POLLERR
 #include <errno.h>			// errno
 
-// TODO: Do we need Client struct? (used outside of setup?)
 static struct {
 	int fd;
 	char name[CHAT_USER_NAME_SIZE];
@@ -22,19 +21,18 @@ static struct {
 
 int chat_client_setup(const char* ip, const char* port)
 {
-	// connect
-	Client.fd = chat_tcp_connect(ip, port);
-	if (Client.fd < 0) {
-		log_error("Error(setup): Could not set up client conection.");
+	// get user info
+	char room[CHAT_ROOM_SIZE];
+	if (chat_get_input_username(Client.name, sizeof(Client.name)) || chat_get_input_room(room, sizeof(room))) {
+		log_error("Could not get client info. Exiting.");
+		close(Client.fd);
 		return -1;
 	}
 
-	// get user info
-	char room[CHAT_ROOM_SIZE];
-	if (chat_get_input_username(Client.name, sizeof(Client.name)) &&
-		chat_get_input_room(room, sizeof(room))) {
-		log_error("Could not get client info. Exiting.");
-		close(Client.fd);
+	// connect
+	Client.fd = chat_tcp_connect(ip, port);
+	if (Client.fd < 0) {
+		log_error("Error(setup): Could not set up conection.");
 		return -1;
 	}
 
@@ -45,6 +43,7 @@ int chat_client_setup(const char* ip, const char* port)
 		close(Client.fd);
 		return -1;
 	}
+	log_info("Connected to room %s.", room);
 	return Client.fd;
 }
 
@@ -57,6 +56,9 @@ void chat_run_client(int server_fd)
     pfds[0].events = POLLIN;
     pfds[1].fd = server_fd;
     pfds[1].events = POLLIN;
+
+	print_chat_top_box();
+    print_chat_prompt(Client.name);
 
     while (1) {
         int ready = poll(pfds, 2, -1);
@@ -72,7 +74,8 @@ void chat_run_client(int server_fd)
         if (pfds[1].revents & (POLLIN | POLLHUP | POLLERR)) {
             int n = chat_recv_all(server_fd, buffer, sizeof(buffer));
             if (n <= 0) {
-                log_info("Server disconnected.");
+				printf("\n");
+                log_error("Server disconnected.");
                 break;
             }
 			printf(ANSI_CLEAR_LINE);
@@ -85,12 +88,17 @@ void chat_run_client(int server_fd)
             if (chat_get_input_message(buffer)) {
 				break;
 			}
+            if (strlen(buffer) == 0) {
+				print_chat_prompt(Client.name);
+                continue;  // empty message - dont send
+            }
             if (chat_trap_exit_message(buffer)) {
 				break;
 			}
             if (chat_send_all(server_fd, buffer, strlen(buffer)) < 0) {
 				break;
 			}
+			print_chat_prompt(Client.name);
         }
     }
 

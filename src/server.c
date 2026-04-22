@@ -25,7 +25,7 @@ static int client_count = 0;
 static void remove_client(const int idx);
 
 /* broadcast a new message to all other clients in the room */
-static void broadcast(const int from_idx, const char *msg, size_t len);
+static void broadcast(const int from_idx, const char *msg);
 
 /* add new client to chat room */
 static void handle_new_connection(int listen_fd);
@@ -47,19 +47,21 @@ int chat_server_setup(const char* port)
 		return -1;
 	}
 
+	log_info("Server is up!");
 	return sockfd;
 }
 
 static void remove_client(const int idx)
 {
-    log_info("Client disconnected.");
+    log_info("[%s] left room [%d]", clients[idx].name, clients[idx].room);
+	broadcast(idx, "left the room.");
     chat_disconnect(clients[idx].fd);
     // swap-remove
     clients[idx] = clients[client_count - 1];
     client_count--;
 }
 
-static void broadcast(const int from_idx, const char *msg, size_t len)
+static void broadcast(const int from_idx, const char *msg)
 {
 	// format: "name: message"
     char framed[CHAT_MSG_BUFFER_SIZE + CHAT_USER_NAME_SIZE + 1];
@@ -73,7 +75,7 @@ static void broadcast(const int from_idx, const char *msg, size_t len)
         if (clients[i].room != room) {
 			continue;
 		}
-        chat_send_all(clients[i].fd, framed, len);
+        chat_send_all(clients[i].fd, framed, strlen(framed));
     }
 }
 
@@ -111,14 +113,16 @@ static void handle_new_connection(const int listen_fd)
         return;
     }
 
-	if (handle_handshake(fd, client_count) == -1) {
+	int idx = client_count;
+	if (handle_handshake(fd, idx) == -1) {
 		log_error("Error(handshake): Clound not establish connection.");
 		close(fd);
 		return;
 	}
 
     ++client_count;
-    log_info("Client connected.");
+    log_info("[%s] joined room [%d].", clients[idx].name, clients[idx].room);
+	broadcast(idx, "joind the room.");
 }
 
 static void handle_client_message(const int idx)
@@ -136,7 +140,7 @@ static void handle_client_message(const int idx)
     }
 
     if (n > 0) {
-		broadcast(idx, buffer, (size_t)n);
+		broadcast(idx, buffer);
 	}
 }
 

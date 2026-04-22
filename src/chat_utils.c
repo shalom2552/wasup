@@ -6,8 +6,9 @@
 #include <sys/socket.h>		// send(), recv()
 #include <string.h>			// strlen(), strcspn()
 #include <stdio.h>			// fgets(), stdin
+#include <stdlib.h>			// atoi()
 #include <unistd.h>			// close()
-#include <stddef.h>			// siez_t
+#include <stddef.h>			// size_t
 #include <sys/types.h>		// ssize_t
 
 /* send exactly len bytes to fd */
@@ -15,14 +16,11 @@ static int send_bytes(int fd, const char* buffer, size_t len);
 
 int chat_get_input_message(char *buffer)
 {
-	print_chat_prompt("usname");
-	do { // repeat on empty input
-		if ( !fgets(buffer, CHAT_MSG_BUFFER_SIZE, stdin) ) {
-			log_error("Error(stdin): System error while reading from stdin.");
-			return 1;
-		}
-		buffer[strcspn(buffer, "\n")] = 0; // remove new line
-	} while (strlen(buffer) == 0);
+	if ( !fgets(buffer, CHAT_MSG_BUFFER_SIZE, stdin) ) {
+		log_error("Error(stdin): System error while reading from stdin.");
+		return 1;
+	}
+	buffer[strcspn(buffer, "\n")] = 0;
 	return 0;
 }
 
@@ -99,5 +97,13 @@ int chat_get_input_username(char *out, size_t size)
 
 int chat_get_input_room(char *out, size_t size)
 {
-    return get_user_input("Enter room number", out, size, "1");
+    if (get_user_input("Enter room number", out, size, "0")) {
+        return 1;
+    }
+    int room = atoi(out);
+    if (room < 0 || room > CHAT_MAX_ROOMS) {
+		room = 0;
+	}
+    snprintf(out, size, "%d", room);
+    return 0;
 }

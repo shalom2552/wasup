@@ -37,7 +37,6 @@ static void start_server(const char* port)
 		return;
 	}
 
-	log_info("Connected!");
 	chat_run_server(listen_fd);
 	chat_disconnect(listen_fd);
 }
@@ -50,7 +49,6 @@ static void connect_client(const char* ip, const char* port)
 		return;
 	}
 
-	log_info("Connected to server!");
 	chat_run_client(server_fd);
 	chat_disconnect(server_fd);
 }
