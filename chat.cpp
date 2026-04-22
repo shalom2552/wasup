@@ -1,10 +1,10 @@
-#include "chat/chat_utils.h"
-#include "chat/constants.h"
-#include "chat/server.h"
-#include "chat/client.h"
-#include "chat/utils.h"
-#include <string.h>
+#include "chat_utils.h"
+#include "constants.h"
+#include "server.h"
+#include "client.h"
+#include "utils.h"
 
+#include <string.h>     // strcmp()
 #include <signal.h>		// SIGINT
 
 /* setup server and run chat */

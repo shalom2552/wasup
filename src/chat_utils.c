@@ -1,6 +1,6 @@
-#include "chat/chat_utils.h"
-#include "chat/constants.h"
-#include "chat/utils.h"
+#include "chat_utils.h"
+#include "constants.h"
+#include "utils.h"
 
 #include <errno.h>			// errno
 #include <sys/socket.h>		// send(), recv()

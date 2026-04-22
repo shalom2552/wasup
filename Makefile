@@ -1,9 +1,9 @@
 CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -g
 CFLAGS   = -std=c99 -Wall -Wextra -pedantic -g
-CPPFLAGS += -I../../inc
+CPPFLAGS += -Iinc
 
-SRC_CPP = $(wildcard ../../src/chat/*.cpp)
-SRC_C   = $(wildcard ../../src/chat/*.c)
+SRC_CPP = $(wildcard src/*.cpp)
+SRC_C   = $(wildcard src/*.c)
 OBJ     = $(SRC_C:.c=.o) $(SRC_CPP:.cpp=.o)
 
 TRG = chat

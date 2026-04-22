@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200112L
-#include "chat/tcp.h"
-#include "chat/utils.h"
+#include "tcp.h"
+#include "utils.h"
 
 #include <errno.h>			// errno
 #include <string.h>			// memset()

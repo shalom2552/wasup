@@ -1,8 +1,8 @@
-#include "chat/server.h"
-#include "chat/utils.h"
-#include "chat/chat_utils.h"
-#include "chat/constants.h"
-#include "chat/tcp.h"
+#include "server.h"
+#include "utils.h"
+#include "chat_utils.h"
+#include "constants.h"
+#include "tcp.h"
 
 #include <stdlib.h>
 #include <string.h>			// strchr()

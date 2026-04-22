@@ -1,5 +1,5 @@
-#include "chat/utils.h"
-#include "chat/constants.h"
+#include "utils.h"
+#include "constants.h"
 
 #include <stdarg.h>		// va_list
 #include <stdio.h>		// printf(), fprintf

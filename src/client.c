@@ -1,11 +1,11 @@
-#include <stdio.h>
 #define _POSIX_C_SOURCE 200112L
-#include "chat/client.h"
-#include "chat/utils.h"
-#include "chat/tcp.h"
-#include "chat/constants.h"
-#include "chat/chat_utils.h"
+#include "client.h"
+#include "utils.h"
+#include "tcp.h"
+#include "constants.h"
+#include "chat_utils.h"
 
+#include <stdio.h>
 #include <sys/socket.h>		// socket(), bind(), listen(), accept(), setsockopt()
 #include <netdb.h>			// getaddrinfo(), struct addrinfo
 #include <string.h>			// memset()
