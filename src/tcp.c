@@ -8,6 +8,9 @@
 #include <netdb.h>			// getaddrinfo(), struct addrinfo
 #include <fcntl.h>			// fcntl()
 
+/* iterate address list and bind to first available socket */
+static int bind_to_addrinfo(struct addrinfo* res);
+
 int set_nonblocking(int fd)
 {
 	int flags = fcntl(fd, F_GETFL, 0);
@@ -20,6 +23,35 @@ int set_nonblocking(int fd)
     }
 
 	return 0;
+}
+
+static int bind_to_addrinfo(struct addrinfo* res)
+{
+	int sockfd = -1;
+	for (struct addrinfo* rp = res; rp != NULL; rp = rp->ai_next) {
+
+		sockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+		if (sockfd == -1) {
+			continue; // try next ai
+		}
+
+		if (set_nonblocking(sockfd) == -1) {
+			log_warn("Warning: Failed to set non-blocking."); // non-fatal
+		}
+
+		const int enable = 1;
+		if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) == -1) {
+			log_warn("Warning(socket): Port reuse failed."); // non-fatal
+		}
+
+		if (bind(sockfd, rp->ai_addr, rp->ai_addrlen) == 0) {
+			return sockfd; // success
+		}
+
+		close(sockfd);
+		sockfd = -1;
+	}
+	return -1;
 }
 
 int chat_tcp_bind(const char* port)
@@ -39,30 +71,7 @@ int chat_tcp_bind(const char* port)
 		return -1;
 	}
 
-	int sockfd = -1;
-	for (struct addrinfo* rp = res; rp != NULL; rp = rp->ai_next) {
-
-		sockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-		if (sockfd == -1) {
-			continue; // try next ai
-		}
-
-		if (set_nonblocking(sockfd) == -1) {
-			log_warn("Warning: Failed to set non-blocking."); // non-fatal
-		}
-
-		const int enable = 1;
-		if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) == -1) {
-			log_warn("Warning(socket): Port reuse failed."); // non-fatal
-		}
-
-		if (bind(sockfd, rp->ai_addr, rp->ai_addrlen) == 0) {
-			break; // success
-		}
-
-		close(sockfd);
-		sockfd = -1;
-	}
+	int sockfd = bind_to_addrinfo(res);
 
 	if (sockfd == -1) {
 		log_error("Error(bind): Could not bind socket to port.");

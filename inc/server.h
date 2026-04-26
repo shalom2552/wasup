@@ -2,12 +2,16 @@
 #define CHAT_SERVER_H
 
 #include "constants.h"
+#include <poll.h>
 
 /* bind socket to port and start listening */
 int chat_server_setup(const char* port);
 
 /* start main server loop to manage connections and messages */
 void chat_run_server(const int listen_fd);
+
+/* handle polling events for new connections and client messages */
+void handle_server_events(struct pollfd* pfds, int listen_fd);
 
 /* accept new connection and perform handshake */
 void handle_new_connection(const int listen_fd);

@@ -62,21 +62,26 @@ void chat_run_server(const int listen_fd)
             break;
         }
 
-        // listen socket
-        if (pfds[0].revents & POLLIN) {
-            handle_new_connection(listen_fd);
-        }
-
-        // clients — iterate backwards because remove_client swaps
-        for (int i = client_count - 1; i >= 0; i--) {
-            if (pfds[i + 1].revents & (POLLIN | POLLHUP | POLLERR)) {
-                handle_client_message(i);
-            }
-        }
+        handle_server_events(pfds, listen_fd);
     }
 
     chat_disconnect(listen_fd);
     log_info("Chat ended.");
+}
+
+void handle_server_events(struct pollfd* pfds, int listen_fd)
+{
+    // listen socket
+    if (pfds[0].revents & POLLIN) {
+        handle_new_connection(listen_fd);
+    }
+
+    // clients — iterate backwards because remove_client swaps
+    for (int i = client_count - 1; i >= 0; i--) {
+        if (pfds[i + 1].revents & (POLLIN | POLLHUP | POLLERR)) {
+            handle_client_message(i);
+        }
+    }
 }
 
 void handle_new_connection(const int listen_fd)
