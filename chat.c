@@ -13,7 +13,8 @@ static void start_server(const char* port);
 /* connect to server and run chat */
 static void connect_client(const char* ip, const char* port);
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
 	signal(SIGINT, handle_sigint);
 	print_welcome_message();
 

@@ -68,7 +68,8 @@ void chat_disconnect(int fd)
 	}
 }
 
-int validate_room_input(char* input) {
+int validate_room_input(char* input)
+{
     int room = atoi(input);
     if (room < 0 || room > CHAT_MAX_ROOMS) {
 		room = 0;

@@ -14,7 +14,7 @@ extern "C" {
 int chat_client_setup(const char* ip, const char* port);
 
 /* read the server message if its a system notification handle it else return 0 */
-int handle_server_notification(char* buffer);
+void handle_recived_message(char* buffer);
 
 /**
  * @brief Run chat loop.

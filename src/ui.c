@@ -53,7 +53,8 @@ void print_logo(void)
 		);
 }
 
-void handle_sigint(int sig) {
+void handle_sigint(int sig)
+{
 	printf("\n%sCaught signal %d. Server shut down.%s\n", C_RED, sig, C_NC);
     exit(0);
 }
