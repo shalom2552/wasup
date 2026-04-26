@@ -15,8 +15,16 @@ enum ChatLimits {
 	CHAT_MSG_BUFFER_SIZE = 2048,
 	CHAT_MAX_CLIENTS	 = 64,
 	CHAT_ROOM_SIZE		 = 8,
-	CHAT_MAX_ROOMS		 = 10
+	CHAT_MAX_ROOMS		 = 10,
 };
+
+enum ServerNotifyCode {
+    NOTIFY_ROOM_COUNT_UPDATE = 0,
+};
+
+// terminal
+#define ANSI_SAVE_CURSUR "\0337"
+#define ANSI_RESTORE_CURSUR "\0338"
 
 // colors
 #define ANSI_CLEAR  "\033[H\033[2J\033[3J"	// clear screen

@@ -4,6 +4,7 @@
 #include "constants.h"
 #include "tcp.h"
 
+#include <iso646.h>
 #include <stdlib.h>
 #include <string.h>			// strchr()
 #include <sys/socket.h>		// listen()
@@ -19,19 +20,8 @@ typedef struct {
 } client_t;
 
 static client_t clients[CHAT_MAX_CLIENTS];
+static int room_count[CHAT_MAX_ROOMS] = {0};
 static int client_count = 0;
-
-/* remove client from the list and close his fd */
-static void remove_client(const int idx);
-
-/* broadcast a new message to all other clients in the room */
-static void broadcast(const int from_idx, const char *msg);
-
-/* add new client to chat room */
-static void handle_new_connection(int listen_fd);
-
-/* get user name and room number */
-static int handle_handshake(const int fd, const int idx);
 
 int chat_server_setup(const char* port)
 {
@@ -51,7 +41,7 @@ int chat_server_setup(const char* port)
 	return sockfd;
 }
 
-static void remove_client(const int idx)
+void remove_client(const int idx)
 {
     log_info("[%s] left room [%d]", clients[idx].name, clients[idx].room);
 	broadcast(idx, "left the room.");
@@ -61,14 +51,14 @@ static void remove_client(const int idx)
     client_count--;
 }
 
-static void broadcast(const int from_idx, const char *msg)
+void broadcast(const int from_idx, const char *msg)
 {
 	// format: "name: message"
     char framed[CHAT_MSG_BUFFER_SIZE + CHAT_USER_NAME_SIZE + 1];
     snprintf(framed, sizeof(framed), "%s:%s", clients[from_idx].name, msg);
 
     int room = clients[from_idx].room;
-    for (int i = 0; i < client_count; i++) {
+    for (int i = 0; i < client_count; ++i) {
         if (i == from_idx) {
 			continue;
 		}
@@ -79,7 +69,20 @@ static void broadcast(const int from_idx, const char *msg)
     }
 }
 
-static int handle_handshake(const int fd, const int idx)
+void notify_room(int to_room, int count)
+{
+    char* NOTIFY_PREFIX = "SERVER_NOTIFY:";
+    char notification[256];
+
+    snprintf(notification, sizeof(notification), "%s%d:%d", NOTIFY_PREFIX, NOTIFY_ROOM_COUNT_UPDATE, count);
+    for (int i = 0; i < client_count; ++i) {
+        if (clients[i].room == to_room) {
+            chat_send_all(clients[i].fd, notification, strlen(notification));
+        }
+    }
+}
+
+int handle_handshake(const int fd, const int idx)
 {
 	char buffer[CHAT_USER_NAME_SIZE + CHAT_ROOM_SIZE];
 	int n = chat_recv_all(fd, buffer, sizeof(buffer));
@@ -100,7 +103,7 @@ static int handle_handshake(const int fd, const int idx)
 	return 0;
 }
 
-static void handle_new_connection(const int listen_fd)
+void handle_new_connection(const int listen_fd)
 {
     int fd = chat_tcp_accept(listen_fd);
     if (fd < 0) {
@@ -121,11 +124,12 @@ static void handle_new_connection(const int listen_fd)
 	}
 
     ++client_count;
-    log_info("[%s] joined room [%d].", clients[idx].name, clients[idx].room);
+    notify_room(clients[idx].room, ++room_count[clients[idx].room]);
 	broadcast(idx, "joind the room.");
+    log_info("[%s] joined room [%d].", clients[idx].name, clients[idx].room);
 }
 
-static void handle_client_message(const int idx)
+void handle_client_message(const int idx)
 {
     char buffer[CHAT_MSG_BUFFER_SIZE];
     int n = chat_recv_all(clients[idx].fd, buffer, sizeof(buffer));

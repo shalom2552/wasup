@@ -176,7 +176,7 @@ void print_chat_bottom_box(void)
 
 void save_cursor_position(void)
 {
-    printf("\0337");
+    printf(ANSI_SAVE_CURSUR);
     fflush(stdout);
 }
 
@@ -188,7 +188,15 @@ void move_cursor_to_position(int y, int x)
 
 void restore_cursor_position(void)
 {
-    printf("\0338");
+    printf(ANSI_RESTORE_CURSUR);
     fflush(stdout);
+}
+
+void print_room_count(int n)
+{
+    save_cursor_position();
+    move_cursor_to_position(15, 25);
+    printf("Users in room: %d", n);
+    restore_cursor_position();
 }
 

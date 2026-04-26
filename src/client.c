@@ -47,6 +47,23 @@ int chat_client_setup(const char* ip, const char* port)
 	return Client.fd;
 }
 
+int handle_server_notification(char* buffer)
+{
+    char* NOTIFY_PREFIX = "SERVER_NOTIFY:";
+    int code = -1;
+    int count = -1;
+
+    if (strncmp(buffer, NOTIFY_PREFIX, strlen(NOTIFY_PREFIX)) == 0) {
+        char* notification = buffer + strlen(NOTIFY_PREFIX);
+        if (sscanf(notification, "%d:%d", &code, &count) == 2) {
+            print_room_count(count);
+        }
+        return 1;
+    }
+
+    return 0; // not a server notification
+}
+
 void chat_run_client(int server_fd)
 {
 	char buffer[CHAT_MSG_BUFFER_SIZE];
@@ -78,9 +95,11 @@ void chat_run_client(int server_fd)
                 log_error("Server disconnected.");
                 break;
             }
-			printf(ANSI_CLEAR_LINE);
-            print_chat_message(buffer);
-            print_chat_prompt(Client.name);
+            if ( !handle_server_notification(buffer) ) {
+                printf(ANSI_CLEAR_LINE);
+                print_chat_message(buffer);
+                print_chat_prompt(Client.name);
+            }
         }
 
         // send message

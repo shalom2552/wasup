@@ -63,6 +63,9 @@ void move_cursor_to_position(int y, int x);
 /* move the cursor to the last saved position */
 void restore_cursor_position(void);
 
+/* print the current clients in the room */
+void print_room_count(int n);
+
 #ifdef __cplusplus
 }
 #endif // !__cplusplus
