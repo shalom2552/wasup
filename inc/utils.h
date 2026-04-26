@@ -13,6 +13,9 @@ void handle_sigint(int sig);
 /* send ansii clear screen */
 void clear_screen(void);
 
+/* send ansi codes to go up line and clear the line */
+void clear_above_line(void);
+
 /* prints a welcom messge at the start of the program */
 void print_welcome_message(void);
 
@@ -28,9 +31,6 @@ void log_warn(const char * msg);
 /* print error messge */
 void log_info(const char * msg, ...);
 
-/* prompt the user for info input like username or  room number */
-int get_user_input(const char *label, char *out, size_t size, const char *fallback);
-
 /* split username and message framed as username:msg */
 void split_message(char* raw_msg, char** username, char** msg);
 
@@ -38,10 +38,22 @@ void split_message(char* raw_msg, char** username, char** msg);
 void print_chat_message(char* raw_msg);
 
 /* print a prompt to user to type message */
-void print_chat_prompt(const char* username);
+void print_chat_message_prompt(const char* username);
 
 /* print the current time in a given color */
 void print_current_time(const char* color);
+
+/* print prompt system info input from user */
+void print_info_prompt(const char* label);
+
+/* flush stdin for leftovers */
+void flush_stdin_line(const char* buffer, size_t size);
+
+/* replace new line with terminator or if the buffer is empty set the fallback */
+void strip_new_line_or_fallback(char* buffer, size_t size, const char* fallback);
+
+/* prompt the user for info input like username or  room number */
+int get_user_input(const char *label, char *out, size_t size, const char *fallback);
 
 /* print the top border of the chat */
 void print_chat_top_box(void);

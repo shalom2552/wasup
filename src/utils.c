@@ -19,6 +19,11 @@ void clear_screen(void)
     printf(ANSI_CLEAR);
 }
 
+void clear_above_line(void)
+{
+	printf(ANSI_MOVE_UP_ONCE ANSI_CLEAR_LINE);
+}
+
 void print_welcome_message(void)
 {
 	clear_screen();
@@ -100,7 +105,7 @@ void print_chat_message(char* raw_msg)
 	printf("%s%s%s%s: %s\n", C_BOLD, C_GREEN, username, C_NC, msg);
 }
 
-void print_chat_prompt(const char* username)
+void print_chat_message_prompt(const char* username)
 {
     print_current_time(C_GRAY);
 
@@ -125,22 +130,45 @@ void print_current_time(const char* color)
 	printf("%s[%s]%s ", color, buffer, C_NC);
 }
 
-int get_user_input(const char *label, char *out, size_t size, const char *fallback)
+void print_info_prompt(const char* label)
 {
     printf("%s%s[CHAT]%s %s %s❯%s ",
            C_YELLOW, C_BOLD, C_NC, label,
            C_YELLOW, C_NC);
     fflush(stdout);
+}
+
+void flush_stdin_line(const char* buffer, size_t size)
+{
+    if ( !memchr(buffer, '\n', size)) {
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+    }
+}
+
+void strip_new_line_or_fallback(char* buffer, size_t size, const char* fallback)
+{
+    buffer[strcspn(buffer, "\n")] = 0;
+    if (strlen(buffer) == 0 && fallback) {
+        strncpy(buffer, fallback, size - 1);
+        buffer[size - 1] = '\0';
+    }
+}
+
+int get_user_input(const char *label, char *out, size_t size, const char *fallback)
+{
+    print_info_prompt(label);
+
+    // get input
     if (!fgets(out, size, stdin)) {
         log_error("Error(stdin): System error while reading from stdin.");
         return 1;
     }
-    out[strcspn(out, "\n")] = 0;
-    if (strlen(out) == 0 && fallback) {
-        strncpy(out, fallback, size - 1);
-        out[size - 1] = '\0';
-    }
-	printf(ANSI_CLEAR_LINE);
+
+    flush_stdin_line(out, size);
+    strip_new_line_or_fallback(out, size, fallback);
+
+    clear_above_line();
     return 0;
 }
 

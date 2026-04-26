@@ -23,7 +23,9 @@ int chat_client_setup(const char* ip, const char* port)
 {
 	// get user info
 	char room[CHAT_ROOM_SIZE];
-	if (chat_get_input_username(Client.name, sizeof(Client.name)) || chat_get_input_room(room, sizeof(room))) {
+	if (chat_get_input_username(Client.name, sizeof(Client.name)) ||
+        chat_get_input_room(room, sizeof(room)))
+    {
 		log_error("Could not get client info. Exiting.");
 		return -1;
 	}
@@ -74,7 +76,7 @@ void chat_run_client(int server_fd)
     pfds[1].events = POLLIN;
 
 	print_chat_top_box();
-    print_chat_prompt(Client.name);
+    print_chat_message_prompt(Client.name);
 
     while (1) {
         int ready = poll(pfds, 2, -1);
@@ -97,7 +99,7 @@ void chat_run_client(int server_fd)
             if ( !handle_server_notification(buffer) ) {
                 printf(ANSI_CLEAR_LINE);
                 print_chat_message(buffer);
-                print_chat_prompt(Client.name);
+                print_chat_message_prompt(Client.name);
             }
         }
 
@@ -107,7 +109,7 @@ void chat_run_client(int server_fd)
 				break;
 			}
             if (strlen(buffer) == 0) {
-				print_chat_prompt(Client.name);
+				print_chat_message_prompt(Client.name);
                 continue;  // empty message - dont send
             }
             if (chat_trap_exit_message(buffer)) {
@@ -116,7 +118,7 @@ void chat_run_client(int server_fd)
             if (chat_send_all(server_fd, buffer, strlen(buffer)) < 0) {
 				break;
 			}
-			print_chat_prompt(Client.name);
+			print_chat_message_prompt(Client.name);
         }
     }
 

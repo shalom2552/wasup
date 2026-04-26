@@ -22,12 +22,13 @@ enum ServerNotifyCode {
 };
 
 // terminal
-#define ANSI_SAVE_CURSUR "\0337"
-#define ANSI_RESTORE_CURSUR "\0338"
-
-// colors
 #define ANSI_CLEAR  "\033[H\033[2J\033[3J"	// clear screen
 #define ANSI_CLEAR_LINE  "\r\033[K"			// clear line
+#define ANSI_SAVE_CURSUR "\0337"            // save cursor position
+#define ANSI_RESTORE_CURSUR "\0338"         // restore cursor position
+#define ANSI_MOVE_UP_ONCE   "\033[A"        // move up one line
+
+// colors
 #define C_CYAN	 "\033[36m"					// color cyan
 #define C_GREEN  "\033[32m"					// color green
 #define C_YELLOW "\033[33m"					// color yellow
