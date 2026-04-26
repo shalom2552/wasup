@@ -174,3 +174,21 @@ void print_chat_bottom_box(void)
 	printf("%s\n", C_NC);
 }
 
+void save_cursor_position(void)
+{
+    printf("\0337");
+    fflush(stdout);
+}
+
+void move_cursor_to_position(int y, int x)
+{
+    printf("\033[%d;%dH", y, x);
+    fflush(stdout);
+}
+
+void restore_cursor_position(void)
+{
+    printf("\0338");
+    fflush(stdout);
+}
+

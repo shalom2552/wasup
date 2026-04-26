@@ -54,6 +54,15 @@ void print_chat_left_box(void);
 /* print the top border of the chat */
 void print_chat_bottom_box(void);
 
+/* save  the cursor position so we can restore later */
+void save_cursor_position(void);
+
+/* move the cursor to a given position on the screen */
+void move_cursor_to_position(int y, int x);
+
+/* move the cursor to the last saved position */
+void restore_cursor_position(void);
+
 #ifdef __cplusplus
 }
 #endif // !__cplusplus
