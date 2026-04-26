@@ -6,6 +6,9 @@
 /* clear terminal screen */
 void clear_screen(void);
 
+/* clear current terminal line */
+void clear_current_line(void);
+
 /* move up and clear previous terminal line */
 void clear_above_line(void);
 
@@ -39,11 +42,8 @@ void print_chat_message(char* raw_msg);
 /* display interactive input prompt for user */
 void print_chat_message_prompt(const char* username);
 
-/* display notification when user leaves room */
-void print_user_left(const char* username);
-
-/* display notification when user joins room */
-void print_user_join(const char* username);
+/* display notification when user join or leaves room */
+void print_user_event(const char* username, const char* event);
 
 /* update and display number of online users in room */
 void print_room_count(int n);

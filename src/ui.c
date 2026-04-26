@@ -14,6 +14,11 @@ void clear_screen(void)
     printf(ANSI_CLEAR);
 }
 
+void clear_current_line(void)
+{
+    printf(ANSI_CLEAR_LINE);
+}
+
 void clear_above_line(void)
 {
 	printf(ANSI_MOVE_UP_ONCE ANSI_CLEAR_LINE);
@@ -136,18 +141,11 @@ void print_chat_message_prompt(const char* username)
     fflush(stdout);
 }
 
-void print_user_left(const char* username)
+void print_user_event(const char* username, const char* event)
 {
-	char* msg = "left the room.";
 	print_current_time(C_GRAY);
-	printf("%s%s%s%s: %s%s\n", C_BOLD, C_GREEN, username, C_YELLOW, msg, C_NC);
-}
-
-void print_user_join(const char* username)
-{
-	char* msg = "joined the room.";
-	print_current_time(C_GRAY);
-	printf("%s%s%s%s: %s%s\n", C_BOLD, C_GREEN, username, C_YELLOW, msg, C_NC);
+    printf("%s%s%s%s: ", C_BOLD, C_GREEN, username, C_NC);
+	printf("%s%s %s%s\n", C_YELLOW, event, "the room", C_NC);
 }
 
 void print_room_count(int n)

@@ -50,7 +50,7 @@ int chat_client_setup(const char *ip, const char *port)
 
 void handle_chat_message(char* payload)
 {
-    printf(ANSI_CLEAR_LINE);
+    clear_current_line();
     print_chat_message(payload);
     print_chat_message_prompt(Client.name);
 }
@@ -71,10 +71,14 @@ void handle_notify_message(char* buffer)
             print_room_count(atoi(data));
             break;
         case NOTIFY_USER_JOIN:
-            print_user_join(data);
+            clear_current_line();
+            print_user_event(data, "joined");
+            print_chat_message_prompt(Client.name);
             break;
         case NOTIFY_USER_LEFT:
-            print_user_left(data);
+            clear_current_line();
+            print_user_event(data, "left");
+            print_chat_message_prompt(Client.name);
             break;
     }
 }
