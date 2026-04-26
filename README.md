@@ -1,18 +1,7 @@
 # Wasup - terminal chat
 
-A lightweight multi-client TUI chat over TCP, written in C.
+A lightweight multi-client TUI chat over TCP, written in C. Supports up to 16 rooms and 64 clients. Single-threaded, poll-based server with no external dependencies.
 
-## Features
-
-- Multi-client support
-- Chat rooms
-- Non-blocking I/O with `poll()`
-- Join/leave notifications
-
-## Roadmap
-
-  - [] Implement structured packet protocol to separate messages from system
-  notifications
 
 ## Build
 
@@ -20,7 +9,7 @@ A lightweight multi-client TUI chat over TCP, written in C.
 make
 ```
 
-Requires: gcc, g++, C99, C++17.
+Requires: gcc, C99.
 
 ## Usage
 
@@ -36,7 +25,7 @@ Requires: gcc, g++, C99, C++17.
 ```
 > defaults: 127.0.0.1 1313
 
-On connect, enter your username and a room number (1–100). Clients in the same room receive each other's messages.
+On connect, enter username and room number (1–16). Clients in the same room receive each other's messages.
 
 ## Commands
 
@@ -47,12 +36,13 @@ On connect, enter your username and a room number (1–100). Clients in the same
 ## Project structure
 
 ```
-./                  — entry point (chat.cpp) + Makefile
+./                  — entry point (chat.c) + Makefile
 inc/                — headers
-src/                — source
-    client.c        — client loop
+src/
+    client.c        — client loop, server event handling
     server.c        — server loop, broadcast, handshake
-    tcp.c           — socket setup (non-blocking)
-    chat_utils.c    — send/recv framing, input helpers
-    utils.c         — display, colors, logging
+    tcp.c           — socket setup, non-blocking connect/accept
+    chat_utils.c    — send/recv framing, notification protocol
+    ui.c            — display, input, colors, cursor
+    log.c           — logging (info, warn, error)
 ```
