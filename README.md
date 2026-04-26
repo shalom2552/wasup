@@ -2,6 +2,22 @@
 
 A lightweight multi-client TUI chat over TCP, written in C. Supports up to 16 rooms and 64 clients. Single-threaded, poll-based server with no external dependencies.
 
+## Screenshots
+
+<table>
+  <tr align="center">
+    <th width="25%">Server</th>
+    <th width="25%">Client 1 (Sam)</th>
+    <th width="25%">Client 2 (Alex)</th>
+    <th width="25%">Client 3 (Jordan)</th>
+  </tr>
+  <tr>
+    <td colspan="4">
+      <img src="https://github.com/user-attachments/assets/bc71dc10-1b21-44d9-9392-c9a668f84b98" alt="TUI Chat Screenshot" width="100%">
+    </td>
+  </tr>
+</table>
+
 
 ## Build
 
