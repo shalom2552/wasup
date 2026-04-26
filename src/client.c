@@ -71,10 +71,10 @@ void handle_notify_message(char* buffer)
             print_room_count(atoi(data));
             break;
         case NOTIFY_USER_JOIN:
-            // TODO: implement
+            print_user_join(data);
             break;
         case NOTIFY_USER_LEFT:
-            // TODO: implement
+            print_user_left(data);
             break;
     }
 }

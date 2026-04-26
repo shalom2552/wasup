@@ -39,6 +39,12 @@ void print_chat_message(char* raw_msg);
 /* print a prompt to user to type message */
 void print_chat_message_prompt(const char* username);
 
+/* print user left message */
+void print_user_left(const char* username);
+
+/* print user joined message */
+void print_user_join(const char* username);
+
 /* print the current clients in the room */
 void print_room_count(int n);
 

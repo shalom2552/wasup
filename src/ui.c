@@ -136,6 +136,20 @@ void print_chat_message_prompt(const char* username)
     fflush(stdout);
 }
 
+void print_user_left(const char* username)
+{
+	char* msg = "left the room.";
+	print_current_time(C_GRAY);
+	printf("%s%s%s%s: %s%s\n", C_BOLD, C_GREEN, username, C_YELLOW, msg, C_NC);
+}
+
+void print_user_join(const char* username)
+{
+	char* msg = "joined the room.";
+	print_current_time(C_GRAY);
+	printf("%s%s%s%s: %s%s\n", C_BOLD, C_GREEN, username, C_YELLOW, msg, C_NC);
+}
+
 void print_room_count(int n)
 {
     int y = 16;

@@ -100,8 +100,8 @@ void handle_new_connection(const int listen_fd)
     }
 
     ++client_count;
+    notify_room_user_event(clients[idx].room, idx, NOTIFY_USER_JOIN);
     notify_room_users_count(clients[idx].room, ++room_count[clients[idx].room]);
-    broadcast(idx, "joined the room.");
     log_info("<%s> joined room #%d.", clients[idx].name, clients[idx].room);
 }
 
@@ -140,68 +140,54 @@ void handle_client_message(const int idx)
         return;
     }
 
-    broadcast(idx, buffer);
-}
-
-void broadcast(const int from_idx, const char *msg)
-{
-    // format: "name: message"
-    char framed[CHAT_MSG_BUFFER_SIZE + CHAT_USER_NAME_SIZE + 1];
-    snprintf(framed, sizeof(framed), "%s:%s", clients[from_idx].name, msg);
-
-    int room = clients[from_idx].room;
-    for (int i = 0; i < client_count; ++i) {
-        if (i == from_idx) {
-            continue;
-        }
-        if (clients[i].room != room) {
-            continue;
-        }
-        chat_notify_client(clients[i].fd, NOTIFY_NEW_MSG, framed);
-    }
-}
-
-void chat_notify_room(int to_room, NotifyCode code, const char* data)
-{
-    for (int i = 0; i < client_count; ++i) {
-        if (clients[i].room == to_room) {
-            chat_notify_client(clients[i].fd, code, data);
-        }
-    }
+    notify_room_new_msg(idx, buffer);
 }
 
 void remove_client(const int idx)
 {
     int room = clients[idx].room;
-    int new_room_count = --room_count[room];
     int client_fd = clients[idx].fd;
-
-    broadcast(idx, "left the room.");
-    log_info("<%s> left room #%d", clients[idx].name, clients[idx].room);
+    int new_room_count = --room_count[room];
 
     clients[idx] = clients[client_count - 1]; // swap-remove
     --client_count;
+
     chat_disconnect(client_fd);
+    notify_room_user_event(room, idx, NOTIFY_USER_LEFT);
     notify_room_users_count(room, new_room_count);
+    log_info("<%s> left room #%d", clients[idx].name, clients[idx].room);
 }
 
-void notify_room_users_count(int room, int count)
+void notify_room(int room, int exclude_idx, NotifyCode code, const char* data)
 {
-    char buf[CHAT_NOTIFY_PAYLOAD_SIZE];
-    snprintf(buf, sizeof(buf), "%d", count);
-    chat_notify_room(room, NOTIFY_ROOM_COUNT, buf);
+    for (int i = 0; i < client_count; ++i) {
+        if (i == exclude_idx) {
+            continue;
+        }
+        if (clients[i].room == room) {
+            chat_notify_client(clients[i].fd, code, data);
+        }
+    }
 }
 
-void notify_room_user_left(int room, char* username)
+void notify_room_new_msg(const int from_idx, const char* msg)
 {
-    char buf[CHAT_NOTIFY_PAYLOAD_SIZE];
-    snprintf(buf, sizeof(buf), "%s", username);
-    chat_notify_room(room, NOTIFY_USER_LEFT, buf);
+    // format: "name:message"
+    char framed[CHAT_MSG_BUFFER_SIZE + CHAT_USER_NAME_SIZE + 1];
+    snprintf(framed, sizeof(framed), "%s:%s", clients[from_idx].name, msg);
+    notify_room(clients[from_idx].room, from_idx, NOTIFY_NEW_MSG, framed);
 }
 
-void notify_room_user_join(int room, char* username)
+void notify_room_users_count(const int room, const int count)
 {
-    char buf[CHAT_NOTIFY_PAYLOAD_SIZE];
-    snprintf(buf, sizeof(buf), "%s", username);
-    chat_notify_room(room, NOTIFY_USER_JOIN, buf);
+    char buffer[CHAT_NOTIFY_PAYLOAD_SIZE];
+    snprintf(buffer, sizeof(buffer), "%d", count);
+    notify_room(room, -1, NOTIFY_ROOM_COUNT, buffer);
+}
+
+void notify_room_user_event(const int room, const int idx, const NotifyCode code)
+{
+    char buffer[CHAT_NOTIFY_PAYLOAD_SIZE];
+    snprintf(buffer, sizeof(buffer), "%s", clients[idx].name);
+    notify_room(room, idx, code, buffer);
 }
