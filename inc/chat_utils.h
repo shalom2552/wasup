@@ -27,6 +27,9 @@ void chat_disconnect(int fd);
 /* get username return 0 on failure */
 int chat_get_input_username(char *out, size_t size);
 
+/* checks if the input room is in the valid range, sets to 0 if not */
+int validate_room_input(char* input);
+
 /* get chat room return 0 on failure */
 int chat_get_input_room(char *out, size_t size);
 

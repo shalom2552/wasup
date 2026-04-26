@@ -9,6 +9,11 @@ A lightweight multi-client TUI chat over TCP, written in C.
 - Non-blocking I/O with `poll()`
 - Join/leave notifications
 
+## Roadmap
+
+  - [] Implement structured packet protocol to separate messages from system
+  notifications
+
 ## Build
 
 ```sh

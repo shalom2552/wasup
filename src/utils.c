@@ -78,12 +78,12 @@ void log_info(const char * msg, ...)
 	va_end(args);
 }
 
-void split_message(const char* raw_msg, char** username, char** msg)
+void split_message(char* raw_msg, char** username, char** msg)
 {
     char *colon = strchr(raw_msg, ':');
     if (!colon) {
         *username = "";
-        *msg = (char *)raw_msg;
+        *msg = raw_msg;
         return;
     }
     *colon = '\0';
@@ -91,7 +91,7 @@ void split_message(const char* raw_msg, char** username, char** msg)
     *msg = colon + 1;
 }
 
-void print_chat_message(const char* raw_msg)
+void print_chat_message(char* raw_msg)
 {
 	char* username;
 	char* msg;
@@ -195,7 +195,7 @@ void restore_cursor_position(void)
 void print_room_count(int n)
 {
     save_cursor_position();
-    move_cursor_to_position(15, 25);
+    move_cursor_to_position(15, 20);
     printf("Users in room: %d", n);
     restore_cursor_position();
 }

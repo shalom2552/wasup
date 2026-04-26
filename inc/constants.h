@@ -8,7 +8,6 @@ extern "C" {
 #define CHAT_VERSION_NO		 "1.3.2"
 #define CHAT_DEFAULT_PORT	 "1313"
 #define CHAT_LOCAL_HOST		 "127.0.0.1"
-#define CHAT_LISTEN_BACKLOG  1
 
 enum ChatLimits {
 	CHAT_USER_NAME_SIZE  = 20,

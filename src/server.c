@@ -4,8 +4,6 @@
 #include "constants.h"
 #include "tcp.h"
 
-#include <iso646.h>
-#include <stdlib.h>
 #include <string.h>			// strchr()
 #include <sys/socket.h>		// listen()
 #include <unistd.h>			// close()
@@ -31,7 +29,7 @@ int chat_server_setup(const char* port)
 	}
 
 	// listen
-	if (listen(sockfd, 1) == -1) {
+	if (listen(sockfd, SOMAXCONN) == -1) {
 		log_error("Error(listen): Could not listen on socket.");
 		close(sockfd);
 		return -1;
@@ -98,7 +96,7 @@ int handle_handshake(const int fd, const int idx)
 	*colon = '\0';
 	strncpy(clients[idx].name, buffer, CHAT_USER_NAME_SIZE - 1);
 	clients[idx].name[CHAT_USER_NAME_SIZE -  1] = '\0';
-	clients[idx].room = atoi(colon + 1);
+	clients[idx].room = validate_room_input(colon + 1);
 	clients[idx].fd = fd;
 	return 0;
 }
@@ -118,14 +116,14 @@ void handle_new_connection(const int listen_fd)
 
 	int idx = client_count;
 	if (handle_handshake(fd, idx) == -1) {
-		log_error("Error(handshake): Clound not establish connection.");
+		log_error("Error(handshake): Could not establish connection.");
 		close(fd);
 		return;
 	}
 
     ++client_count;
     notify_room(clients[idx].room, ++room_count[clients[idx].room]);
-	broadcast(idx, "joind the room.");
+	broadcast(idx, "joined the room.");
     log_info("[%s] joined room [%d].", clients[idx].name, clients[idx].room);
 }
 
@@ -143,9 +141,7 @@ void handle_client_message(const int idx)
         return;
     }
 
-    if (n > 0) {
-		broadcast(idx, buffer);
-	}
+    broadcast(idx, buffer);
 }
 
 void chat_run_server(const int listen_fd)
@@ -182,7 +178,7 @@ void chat_run_server(const int listen_fd)
         }
     }
 
-    close(listen_fd);
+    chat_disconnect(listen_fd);
 	log_info("Chat ended.");
 }
 

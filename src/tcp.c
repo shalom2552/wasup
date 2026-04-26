@@ -18,7 +18,10 @@ static int set_nonblocking(int fd)
 		return -1;
 	}
 
-	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+        return -1;
+    }
+
 	return 0;
 }
 

@@ -7,8 +7,6 @@ extern "C" {
 
 #include <stddef.h>		// size_t
 
-extern int G_SOCKFD;
-
 /* trap ctl-c */
 void handle_sigint(int sig);
 
@@ -34,10 +32,10 @@ void log_info(const char * msg, ...);
 int get_user_input(const char *label, char *out, size_t size, const char *fallback);
 
 /* split username and message framed as username:msg */
-void split_message(const char* raw_msg, char** username, char** msg);
+void split_message(char* raw_msg, char** username, char** msg);
 
 /* print a messge to the screen */
-void print_chat_message(const char* raw_msg);
+void print_chat_message(char* raw_msg);
 
 /* print a prompt to user to type message */
 void print_chat_prompt(const char* username);

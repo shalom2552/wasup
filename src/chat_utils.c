@@ -76,7 +76,9 @@ int chat_recv_all(const int fd, char *buffer, size_t size)
 
 int chat_trap_exit_message(const char* msg)
 {
-	if (strstr(msg, "/exit") || strstr(msg, "/quit") || strstr(msg, "/q"))
+	if (strstr(msg, "/exit") == 0
+        || strstr(msg, "/quit") == 0
+        || strstr(msg, "/q") == 0)
 	{
 		return 1;
 	}
@@ -95,15 +97,20 @@ int chat_get_input_username(char *out, size_t size)
     return get_user_input("Enter user name", out, size, "Anonymous");
 }
 
+int validate_room_input(char* input) {
+    int room = atoi(input);
+    if (room < 0 || room > CHAT_MAX_ROOMS) {
+		room = 0;
+	}
+    return room;
+}
+
 int chat_get_input_room(char *out, size_t size)
 {
     if (get_user_input("Enter room number", out, size, "0")) {
         return 1;
     }
-    int room = atoi(out);
-    if (room < 0 || room > CHAT_MAX_ROOMS) {
-		room = 0;
-	}
+    int room = validate_room_input(out);
     snprintf(out, size, "%d", room);
     return 0;
 }
