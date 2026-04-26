@@ -18,14 +18,14 @@
 static struct {
 	int fd;
 	char name[CHAT_USER_NAME_SIZE];
+    char room[CHAT_ROOM_SIZE];
 } Client;
 
 int chat_client_setup(const char* ip, const char* port)
 {
 	// get user info
-	char room[CHAT_ROOM_SIZE];
 	if (chat_get_input_username(Client.name, sizeof(Client.name)) ||
-        chat_get_input_room(room, sizeof(room)))
+        chat_get_input_room(Client.room, sizeof(Client.room)))
     {
 		log_error("Could not get client info. Exiting.");
 		return -1;
@@ -40,7 +40,7 @@ int chat_client_setup(const char* ip, const char* port)
 
 	// handshake
 	char handshake[CHAT_USER_NAME_SIZE + CHAT_ROOM_SIZE + 1];
-	snprintf(handshake, sizeof(handshake), "%s:%s", Client.name, room);
+	snprintf(handshake, sizeof(handshake), "%s:%s", Client.name, Client.room);
 	if (chat_send_all(Client.fd, handshake, strlen(handshake))) {
 		close(Client.fd);
 		return -1;
