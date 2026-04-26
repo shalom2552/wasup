@@ -41,12 +41,17 @@ int chat_server_setup(const char* port)
 
 void remove_client(const int idx)
 {
+    int room = clients[idx].room;
+    int new_room_count = --room_count[room];
+    int client_fd = clients[idx].fd;
+
+    broadcast(idx, "left the room.");
     log_info("[%s] left room [%d]", clients[idx].name, clients[idx].room);
-	broadcast(idx, "left the room.");
-    chat_disconnect(clients[idx].fd);
-    // swap-remove
-    clients[idx] = clients[client_count - 1];
-    client_count--;
+
+    clients[idx] = clients[client_count - 1]; // swap-remove
+    --client_count;
+    chat_disconnect(client_fd);
+    notify_room(room, new_room_count);
 }
 
 void broadcast(const int from_idx, const char *msg)
