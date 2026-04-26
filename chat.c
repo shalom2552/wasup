@@ -1,7 +1,8 @@
 #include "constants.h"
 #include "server.h"
 #include "client.h"
-#include "utils.h"
+#include "ui.h"
+#include "log.h"
 
 #include <string.h>     // strcmp()
 #include <signal.h>		// SIGINT
@@ -12,16 +13,16 @@ static void start_server(const char* port);
 /* connect to server and run chat */
 static void connect_client(const char* ip, const char* port);
 
-int main (int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 	signal(SIGINT, handle_sigint);
 	print_welcome_message();
 
 	if (argc > 1 && strcmp(argv[1], "-s") == 0) {
-		const char *port = (argc > 2) ? argv[2] : CHAT_DEFAULT_PORT;
+		const char* port = (argc > 2) ? argv[2] : CHAT_DEFAULT_PORT;
 		start_server(port);
 	} else {
-		const char *ip   = (argc > 1) ? argv[1] : CHAT_LOCAL_HOST;
-		const char *port = (argc > 2) ? argv[2] : CHAT_DEFAULT_PORT;
+		const char* ip   = (argc > 1) ? argv[1] : CHAT_LOCAL_HOST;
+		const char* port = (argc > 2) ? argv[2] : CHAT_DEFAULT_PORT;
 		connect_client(ip, port);
 	}
 

@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200112L
 #include "tcp.h"
-#include "utils.h"
+#include "log.h"
 
 #include <errno.h>			// errno
 #include <string.h>			// memset()
@@ -8,10 +8,7 @@
 #include <netdb.h>			// getaddrinfo(), struct addrinfo
 #include <fcntl.h>			// fcntl()
 
-/* set non non-blocking flag to fd */
-static int set_nonblocking(int fd);
-
-static int set_nonblocking(int fd)
+int set_nonblocking(int fd)
 {
 	int flags = fcntl(fd, F_GETFL, 0);
 	if (flags == -1) {
@@ -82,7 +79,7 @@ int chat_tcp_accept(int listen_sockfd)
 	struct sockaddr_storage remote_addr;
 	socklen_t add_size = sizeof(remote_addr);
 
-	int client_fd = accept(listen_sockfd, (struct sockaddr*)&remote_addr, &add_size);
+	int client_fd = accept(listen_sockfd, (struct sockaddr *)&remote_addr, &add_size);
 	if (client_fd == -1) {
 		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			return -2; // no client wating
@@ -98,7 +95,7 @@ int chat_tcp_accept(int listen_sockfd)
 	return client_fd;
 }
 
-int chat_tcp_connect(const char *host, const char *port)
+int chat_tcp_connect(const char* host, const char* port)
 {
     struct addrinfo hints, *res;
     memset(&hints, 0, sizeof(hints));
@@ -111,7 +108,7 @@ int chat_tcp_connect(const char *host, const char *port)
     }
 
     int sockfd = -1;
-    for (struct addrinfo *rp = res; rp; rp = rp->ai_next) {
+    for (struct addrinfo* rp = res; rp; rp = rp->ai_next) {
         sockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (sockfd == -1) {
 			continue; // try next ai

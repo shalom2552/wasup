@@ -1,6 +1,6 @@
 #include "chat_utils.h"
+#include "log.h"
 #include "constants.h"
-#include "utils.h"
 
 #include <errno.h>			// errno
 #include <sys/socket.h>		// send(), recv()
@@ -11,24 +11,11 @@
 #include <stddef.h>			// size_t
 #include <sys/types.h>		// ssize_t
 
-/* send exactly len bytes to fd */
-static int send_bytes(int fd, const char* buffer, size_t len);
-
-int chat_get_input_message(char *buffer)
-{
-	if ( !fgets(buffer, CHAT_MSG_BUFFER_SIZE, stdin) ) {
-		log_error("Error(stdin): System error while reading from stdin.");
-		return 1;
-	}
-	buffer[strcspn(buffer, "\n")] = 0;
-	return 0;
-}
-
-static int send_bytes(int fd, const char* buffer, size_t len)
+int send_bytes(int fd, const char* buffer, size_t len)
 {
 	size_t sent = 0;
 	while (sent < len) {
-		ssize_t n = send(fd, buffer + sent, len - sent, 0);
+		ssize_t n = send(fd, buffer + sent, len - sent, MSG_NOSIGNAL);
 		if (n < 0) {
 			if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK) {
 				continue; // non-blocking
@@ -50,7 +37,7 @@ int chat_send_all(const int fd, const char* buffer, size_t len)
 	return send_bytes(fd, "\n", 1);
 }
 
-int chat_recv_all(const int fd, char *buffer, size_t size)
+int chat_recv_all(const int fd, char* buffer, size_t size)
 {
 	size_t total = 0;
 	while (total < size - 1) {
@@ -74,27 +61,11 @@ int chat_recv_all(const int fd, char *buffer, size_t size)
 	return (int)total;
 }
 
-int chat_trap_exit_message(const char* msg)
-{
-	if (strcmp(msg, "/exit") == 0
-        || strcmp(msg, "/quit") == 0
-        || strcmp(msg, "/q") == 0)
-	{
-		return 1;
-	}
-	return 0;
-}
-
 void chat_disconnect(int fd)
 {
 	if (fd != -1) {
 		close(fd);
 	}
-}
-
-int chat_get_input_username(char *out, size_t size)
-{
-    return get_user_input("Enter user name", out, size, "Anonymous");
 }
 
 int validate_room_input(char* input) {
@@ -105,12 +76,13 @@ int validate_room_input(char* input) {
     return room;
 }
 
-int chat_get_input_room(char *out, size_t size)
+int chat_trap_exit_message(const char* msg)
 {
-    if (get_user_input("Enter room number", out, size, "0")) {
-        return 1;
-    }
-    int room = validate_room_input(out);
-    snprintf(out, size, "%d", room);
-    return 0;
+	if (strcmp(msg, "/exit") == 0
+        || strcmp(msg, "/quit") == 0
+        || strcmp(msg, "/q") == 0)
+	{
+		return 1;
+	}
+	return 0;
 }

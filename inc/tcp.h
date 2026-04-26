@@ -1,11 +1,8 @@
 #ifndef CHAT_TCP_H
 #define CHAT_TCP_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif // !__cplusplus
-
-#include <stdbool.h>
+/* set non non-blocking flag to fd */
+int set_nonblocking(int fd);
 
 /**
  * @brief Create socket and bind to port
@@ -26,11 +23,6 @@ int chat_tcp_accept(int listen_sockfd);
  * @param port To setup on
  * @return the socketid or -1 on error
  */
-int chat_tcp_connect(const char *host, const char *port);
-
-#ifdef __cplusplus
-}
-#endif // !__cplusplus
+int chat_tcp_connect(const char* host, const char* port);
 
 #endif // !CHAT_TCP_H
-

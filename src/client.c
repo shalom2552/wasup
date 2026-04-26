@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200112L
 #include "client.h"
-#include "utils.h"
+#include "ui.h"
+#include "log.h"
 #include "tcp.h"
 #include "constants.h"
 #include "chat_utils.h"
@@ -44,12 +45,12 @@ int chat_client_setup(const char* ip, const char* port)
 		close(Client.fd);
 		return -1;
 	}
-	log_info("Connected to room %s.", room);
 	return Client.fd;
 }
 
 int handle_server_notification(char* buffer)
 {
+    // TODO: genrralize server notifications
     char* NOTIFY_PREFIX = "SERVER_NOTIFY:";
     int code = -1;
     int count = -1;
@@ -96,6 +97,7 @@ void chat_run_client(int server_fd)
                 log_error("Server disconnected.");
                 break;
             }
+            // TODO: handle server notification
             if ( !handle_server_notification(buffer) ) {
                 printf(ANSI_CLEAR_LINE);
                 print_chat_message(buffer);
@@ -122,7 +124,7 @@ void chat_run_client(int server_fd)
         }
     }
 
+    print_chat_bottom_box();
     chat_disconnect(server_fd);
     log_info("Chat ended.");
 }
-
