@@ -4,27 +4,25 @@
 #include "constants.h"
 #include <stddef.h>		// size_t
 
-/* send exactly len bytes to fd */
+/* send raw bytes until len is reached */
 int send_bytes(int fd, const char* buffer, size_t len);
 
-/* send a message to fd, uses new line as framing rule.
- * return 0 on success or -1 on error */
+/* send message with newline framing */
 int chat_send_all(const int fd, const char* buffer, size_t len);
 
-/* recive a message from fd, uses new line as framing rule.
- * return read size, 0 on peer close or -1 on error */
+/* receive message until newline, return bytes read */
 int chat_recv_all(const int fd, char* buffer, size_t size);
 
-/* terminate fd connection */
+/* close connection if fd is valid */
 void chat_disconnect(int fd);
 
-/* checks if the input room is in the valid range, sets to 0 if not */
+/* parse room number and check bounds */
 int validate_room_input(char* input);
 
-/* return 1 if msg is [/exit|/quit|/q] or 0 otherwise */
+/* check if message is exit command */
 int chat_trap_exit_message(const char* msg);
 
-/* send a notification to fd: wire format is "code:data\n" */
+/* send server notification code and data to client */
 int chat_notify_client(int fd, NotifyCode code, const char* data);
 
 #endif // !CHAT_CHAT_UTILS_H

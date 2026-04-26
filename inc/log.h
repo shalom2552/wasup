@@ -1,13 +1,13 @@
 #ifndef CHAT_LOG_H
 #define CHAT_LOG_H
 
-/* print error messge */
+/* print formatted error message in red */
 void log_error(const char* msg, ...);
 
-/* print warning messge */
+/* print formatted warning message in yellow */
 void log_warn(const char* msg, ...);
 
-/* print info messge */
+/* print formatted info message in cyan */
 void log_info(const char* msg, ...);
 
 #endif // !CHAT_LOG_H

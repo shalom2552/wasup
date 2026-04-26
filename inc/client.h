@@ -5,25 +5,16 @@
 extern "C" {
 #endif // !__cplusplus
 
-/**
- * @brief Set up server connection
- * @param ip of the server
- * @param port To setup on
- * @return the socketid or -1 on error
- */
+/* get user info, connect to server and send handshake */
 int chat_client_setup(const char* ip, const char* port);
 
-/* handle incoming chat message payload */
+/* format and print chat message then show prompt */
 void handle_chat_message(char* payload);
 
-/* handle incoming server notification payload */
+/* parse and handle server notification code */
 void handle_notify_message(char* payload);
 
-/**
- * @brief Run chat loop.
- * recive -> display -> read -> send
- * @param server_fd The server socket fd
- */
+/* start main client loop for io and server events */
 void chat_run_client(int server_fd);
 
 #ifdef __cplusplus

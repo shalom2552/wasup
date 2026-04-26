@@ -3,82 +3,82 @@
 
 #include <stddef.h>		// size_t
 
-/* send ansii clear screen */
+/* clear terminal screen */
 void clear_screen(void);
 
-/* send ansi codes to go up line and clear the line */
+/* move up and clear previous terminal line */
 void clear_above_line(void);
 
-/* prints a welcom messge at the start of the program */
+/* display startup screen with logo and welcome text */
 void print_welcome_message(void);
 
-/* Prints ascii art box with the app name */
+/* print application ascii art logo */
 void print_logo(void);
 
-/* trap ctl-c */
+/* handle interrupt signal to exit cleanly */
 void handle_sigint(int sig);
 
-/* print the top border of the chat */
+/* print top decorative border for chat box */
 void print_chat_top_box(void);
 
-/* print the top border of the chat */
+/* print left decorative border for chat line */
 void print_chat_left_box(void);
 
-/* print the top border of the chat */
+/* print bottom decorative border for chat box */
 void print_chat_bottom_box(void);
 
-/* split username and message framed as username:msg */
+/* parse raw string into username and message parts */
 void split_message(char* raw_msg, char** username, char** msg);
 
-/* print the current time in a given color */
+/* print current timestamp with color */
 void print_current_time(const char* color);
 
-/* print a messge to the screen */
+/* format and display incoming chat message */
 void print_chat_message(char* raw_msg);
 
-/* print a prompt to user to type message */
+/* display interactive input prompt for user */
 void print_chat_message_prompt(const char* username);
 
-/* print user left message */
+/* display notification when user leaves room */
 void print_user_left(const char* username);
 
-/* print user joined message */
+/* display notification when user joins room */
 void print_user_join(const char* username);
 
-/* print the current clients in the room */
+/* update and display number of online users in room */
 void print_room_count(int n);
 
-/* prints the room number in the header */
+/* display room name/number in chat header */
 void print_room_header(char* room);
 
-/* save  the cursor position so we can restore later */
+/* save current terminal cursor coordinates */
 void save_cursor_position(void);
 
-/* move the cursor to a given position on the screen */
+/* move terminal cursor to specific x and y */
 void move_cursor_to_position(int y, int x);
 
-/* move the cursor to the last saved position */
+/* restore terminal cursor to last saved position */
 void restore_cursor_position(void);
 
-/* print prompt system info input from user */
+/* print generic system info input prompt */
 void print_info_prompt(const char* label);
 
-/* flush stdin for leftovers */
+/* clear remaining characters from stdin buffer */
 void flush_stdin_line(const char* buffer, size_t size);
 
-/* replace new line with terminator or if the buffer is empty set the fallback */
+/* remove newline from string or use default */
 void strip_new_line_or_fallback(char* buffer, size_t size, const char* fallback);
 
-/* prompt the user for info input like username or  room number */
+/* generic helper to prompt and read user input */
 int get_user_input(const char* label, char* out, size_t size, const char* fallback);
 
-/* prompt a user for a message and save to buffer */
+/* read chat message from user stdin */
 int chat_get_input_message(char* buffer);
 
-/* get username return 0 on failure */
+/* prompt and read user name */
 int chat_get_input_username(char* out, size_t size);
 
-/* get chat room return 0 on failure */
+/* prompt and read room selection */
 int chat_get_input_room(char* out, size_t size);
 
 #endif // !CHAT_UI_H
