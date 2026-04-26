@@ -5,7 +5,7 @@
 extern "C" {
 #endif // __cplusplus
 
-#define CHAT_VERSION_NO		 "1.3.2"
+#define CHAT_VERSION_NO		 "1.4.2"
 #define CHAT_DEFAULT_PORT	 "1313"
 #define CHAT_LOCAL_HOST		 "127.0.0.1"
 
