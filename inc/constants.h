@@ -14,7 +14,7 @@ enum ChatLimits {
 	CHAT_MSG_BUFFER_SIZE = 2048,
 	CHAT_MAX_CLIENTS	 = 64,
 	CHAT_ROOM_SIZE		 = 8,
-	CHAT_MAX_ROOMS		 = 10,
+	CHAT_MAX_ROOMS		 = 16,
 };
 
 enum ServerNotifyCode {

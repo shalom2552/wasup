@@ -137,12 +137,12 @@ void print_chat_message_prompt(const char* username)
 
 void print_room_count(int n)
 {
-    // TODO: implement correctly
     int y = 16;
-    int x = 16;
+    int x = 3;
     save_cursor_position();
     move_cursor_to_position(y, x);
-    printf("Users in room: %d", n);
+    printf("%sonline: ", C_YELLOW);
+    printf("%s%d%s",C_GREEN, n, C_NC);
     restore_cursor_position();
 }
 
@@ -233,7 +233,9 @@ int chat_get_input_username(char* out, size_t size)
 
 int chat_get_input_room(char* out, size_t size)
 {
-    if (get_user_input("Enter room number", out, size, "0")) {
+    char label[36];
+    snprintf(label, sizeof(label), "Enter room number [1-%d]", CHAT_MAX_ROOMS);
+    if (get_user_input(label, out, size, "0")) {
         return 1;
     }
     int room = validate_room_input(out);
