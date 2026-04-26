@@ -76,9 +76,9 @@ int chat_recv_all(const int fd, char *buffer, size_t size)
 
 int chat_trap_exit_message(const char* msg)
 {
-	if (strstr(msg, "/exit") != NULL
-        || strstr(msg, "/quit") != NULL
-        || strstr(msg, "/q") != NULL)
+	if (strcmp(msg, "/exit") == 0
+        || strcmp(msg, "/quit") == 0
+        || strcmp(msg, "/q") == 0)
 	{
 		return 1;
 	}
