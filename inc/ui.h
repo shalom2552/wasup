@@ -42,6 +42,9 @@ void print_chat_message_prompt(const char* username);
 /* print the current clients in the room */
 void print_room_count(int n);
 
+/* prints the room number in the header */
+void print_room_header(char* room);
+
 /* save  the cursor position so we can restore later */
 void save_cursor_position(void);
 

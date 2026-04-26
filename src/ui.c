@@ -138,9 +138,21 @@ void print_chat_message_prompt(const char* username)
 void print_room_count(int n)
 {
     // TODO: implement correctly
+    int y = 16;
+    int x = 16;
     save_cursor_position();
-    move_cursor_to_position(15, 20);
+    move_cursor_to_position(y, x);
     printf("Users in room: %d", n);
+    restore_cursor_position();
+}
+
+void print_room_header(char* room)
+{
+    int y = 17;
+    int x = 20;
+    save_cursor_position();
+    move_cursor_to_position(y, x);
+    printf("%s< room %s >%s", C_YELLOW, room, C_NC);
     restore_cursor_position();
 }
 

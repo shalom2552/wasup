@@ -77,6 +77,7 @@ void chat_run_client(int server_fd)
     pfds[1].events = POLLIN;
 
 	print_chat_top_box();
+    print_room_header(Client.room);
     print_chat_message_prompt(Client.name);
 
     while (1) {
