@@ -11,6 +11,7 @@
 #include <poll.h>    // poll(), POLLIN, POLLHUP, POLLERR
 #include <stdbool.h> // bool
 #include <stdio.h>
+#include <stdlib.h>     // atoi()
 #include <string.h>     // memset()
 #include <sys/socket.h> // socket(), bind(), listen(), accept(), setsockopt()
 #include <unistd.h>     // close()
@@ -47,25 +48,35 @@ int chat_client_setup(const char *ip, const char *port)
     return Client.fd;
 }
 
-void handle_recived_message(char *buffer)
+void handle_chat_message(char* payload)
 {
-
-    // TODO: implement correctly
-    char *NOTIFY_PREFIX = "SERVER_NOTIFY:";
-    int code = -1;
-    int count = -1;
-
-    if (strncmp(buffer, NOTIFY_PREFIX, strlen(NOTIFY_PREFIX)) == 0) {
-        char *notification = buffer + strlen(NOTIFY_PREFIX);
-        if (sscanf(notification, "%d:%d", &code, &count) == 2) {
-            print_room_count(count);
-        }
-        return;
-    }
-
     printf(ANSI_CLEAR_LINE);
-    print_chat_message(buffer);
+    print_chat_message(payload);
     print_chat_message_prompt(Client.name);
+}
+
+void handle_notify_message(char* buffer)
+{
+    char* colon = strchr(buffer, ':');
+    if (!colon) return;
+    *colon = '\0';
+    int code = atoi(buffer);
+    char* data = colon + 1;
+
+    switch ((NotifyCode)code) {
+        case NOTIFY_NEW_MSG:
+            handle_chat_message(data);
+            break;
+        case NOTIFY_ROOM_COUNT:
+            print_room_count(atoi(data));
+            break;
+        case NOTIFY_USER_JOIN:
+            // TODO: implement
+            break;
+        case NOTIFY_USER_LEFT:
+            // TODO: implement
+            break;
+    }
 }
 
 void chat_run_client(int server_fd)
@@ -100,7 +111,7 @@ void chat_run_client(int server_fd)
                 log_error("Server disconnected.");
                 break;
             }
-            handle_recived_message(buffer);
+            handle_notify_message(buffer);
         }
 
         // keyboard input event

@@ -100,7 +100,7 @@ void handle_new_connection(const int listen_fd)
     }
 
     ++client_count;
-    notify_room(clients[idx].room, ++room_count[clients[idx].room]);
+    notify_room_users_count(clients[idx].room, ++room_count[clients[idx].room]);
     broadcast(idx, "joined the room.");
     log_info("<%s> joined room #%d.", clients[idx].name, clients[idx].room);
 }
@@ -157,20 +157,15 @@ void broadcast(const int from_idx, const char *msg)
         if (clients[i].room != room) {
             continue;
         }
-        chat_send_all(clients[i].fd, framed, strlen(framed));
+        chat_notify_client(clients[i].fd, NOTIFY_NEW_MSG, framed);
     }
 }
 
-void notify_room(int to_room, int count)
+void chat_notify_room(int to_room, NotifyCode code, const char* data)
 {
-    char *NOTIFY_PREFIX = "SERVER_NOTIFY:";
-    char notification[256];
-
-    snprintf(notification, sizeof(notification), "%s%d:%d", NOTIFY_PREFIX,
-             NOTIFY_ROOM_COUNT_UPDATE, count);
     for (int i = 0; i < client_count; ++i) {
         if (clients[i].room == to_room) {
-            chat_send_all(clients[i].fd, notification, strlen(notification));
+            chat_notify_client(clients[i].fd, code, data);
         }
     }
 }
@@ -187,5 +182,26 @@ void remove_client(const int idx)
     clients[idx] = clients[client_count - 1]; // swap-remove
     --client_count;
     chat_disconnect(client_fd);
-    notify_room(room, new_room_count);
+    notify_room_users_count(room, new_room_count);
+}
+
+void notify_room_users_count(int room, int count)
+{
+    char buf[CHAT_NOTIFY_PAYLOAD_SIZE];
+    snprintf(buf, sizeof(buf), "%d", count);
+    chat_notify_room(room, NOTIFY_ROOM_COUNT, buf);
+}
+
+void notify_room_user_left(int room, char* username)
+{
+    char buf[CHAT_NOTIFY_PAYLOAD_SIZE];
+    snprintf(buf, sizeof(buf), "%s", username);
+    chat_notify_room(room, NOTIFY_USER_LEFT, buf);
+}
+
+void notify_room_user_join(int room, char* username)
+{
+    char buf[CHAT_NOTIFY_PAYLOAD_SIZE];
+    snprintf(buf, sizeof(buf), "%s", username);
+    chat_notify_room(room, NOTIFY_USER_JOIN, buf);
 }

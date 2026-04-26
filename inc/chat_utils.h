@@ -1,6 +1,7 @@
 #ifndef CHAT_CHAT_UTILS_H
 #define CHAT_CHAT_UTILS_H
 
+#include "constants.h"
 #include <stddef.h>		// size_t
 
 /* send exactly len bytes to fd */
@@ -22,5 +23,8 @@ int validate_room_input(char* input);
 
 /* return 1 if msg is [/exit|/quit|/q] or 0 otherwise */
 int chat_trap_exit_message(const char* msg);
+
+/* send a notification to fd: wire format is "code:data\n" */
+int chat_notify_client(int fd, NotifyCode code, const char* data);
 
 #endif // !CHAT_CHAT_UTILS_H

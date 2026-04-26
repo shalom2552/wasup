@@ -10,16 +10,21 @@ extern "C" {
 #define CHAT_LOCAL_HOST		 "127.0.0.1"
 
 enum ChatLimits {
-	CHAT_USER_NAME_SIZE  = 20,
-	CHAT_MSG_BUFFER_SIZE = 2048,
-	CHAT_MAX_CLIENTS	 = 64,
-	CHAT_ROOM_SIZE		 = 8,
-	CHAT_MAX_ROOMS		 = 16,
+	CHAT_USER_NAME_SIZE      = 20,
+	CHAT_MSG_BUFFER_SIZE     = 2048,
+	CHAT_MAX_CLIENTS         = 64,
+	CHAT_ROOM_SIZE           = 8,
+	CHAT_MAX_ROOMS           = 16,
+	CHAT_NOTIFY_PAYLOAD_SIZE = 32,
 };
 
-enum ServerNotifyCode {
-    NOTIFY_ROOM_COUNT_UPDATE = 0,
-};
+// server notifications type
+typedef enum {
+    NOTIFY_NEW_MSG = 0,
+    NOTIFY_ROOM_COUNT,
+    NOTIFY_USER_JOIN,
+    NOTIFY_USER_LEFT,
+} NotifyCode;
 
 // terminal
 #define ANSI_CLEAR  "\033[H\033[2J\033[3J"	// clear screen
