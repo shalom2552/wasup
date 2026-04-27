@@ -1,18 +1,7 @@
 -Iinc
--Iinc/adt
 -Wall
 -Wextra
 -Werror
 -pedantic
 -Wno-unused-includes
 
-
-If:
-    PathMatch: .*\.cpp
-CompileFlags:
-    -std=c++17
-
-If:
-  PathMatch: .*\.c
-CompileFlags:
-  Add: -std=c11
