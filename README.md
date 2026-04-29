@@ -25,6 +25,8 @@ A lightweight multi-client TUI chat over TCP, written in C. Supports up to 16 ro
 ## Build
 
 ```sh
+git clone https://github.com/shalom2552/wasup
+cd wasup/
 make
 ```
 
