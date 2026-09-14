@@ -2,34 +2,35 @@
 #include "constants.h"
 
 #include <stdarg.h>		// va_list
-#include <stdio.h>		// printf()
+#include <stdio.h>		// printf
 
-void log_error(const char* msg, ...)
+static const char* log_tags[] = {
+    [LOG_ERROR] = "ERROR",
+    [LOG_WARN] = "WARN",
+    [LOG_INFO] = "INFO",
+    [LOG_DEBUG] = "DEBUG"
+};
+
+static const char* log_colors[] = {
+    [LOG_ERROR] = C_RED,
+    [LOG_WARN] = C_YELLOW,
+    [LOG_INFO] = C_CYAN,
+    [LOG_DEBUG] = C_GRAY
+};
+
+void log_msg(LogLevel level, const char* msg, ...)
 {
-	va_list args;
-	va_start(args, msg);
-	printf("%s[ERROR]%s ", C_RED, C_NC);
-	vprintf(msg, args);
-	printf("\n");
-	va_end(args);
+    if (level >= LOG_COUNT) {
+        return;
+    }
+
+    printf("%s[%s]%s ", log_colors[level], log_tags[level], C_NC);
+
+    va_list args;
+    va_start(args, msg);
+    vprintf(msg, args);
+    va_end(args);
+
+    printf("\n");
 }
 
-void log_warn(const char* msg, ...)
-{
-	va_list args;
-	va_start(args, msg);
-	printf("%s[WARN]%s ", C_YELLOW, C_NC);
-	vprintf(msg, args);
-	printf("\n");
-	va_end(args);
-}
-
-void log_info(const char* msg, ...)
-{
-	va_list args;
-	va_start(args, msg);
-	printf("%s[INFO]%s ", C_CYAN, C_NC);
-	vprintf(msg, args);
-	printf("\n");
-	va_end(args);
-}

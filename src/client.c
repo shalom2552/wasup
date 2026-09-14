@@ -16,46 +16,18 @@
 #include <sys/socket.h> // socket(), bind(), listen(), accept(), setsockopt()
 #include <unistd.h>     // close()
 
-static struct {
+// === TYPES ==================================================================
+typedef struct {
     int fd;
     char name[CHAT_USER_NAME_SIZE];
     char room[CHAT_ROOM_SIZE];
 } Client;
 
-int chat_client_setup(const char *ip, const char *port)
-{
-    // get user info
-    if (chat_get_input_username(Client.name, sizeof(Client.name)) ||
-        chat_get_input_room(Client.room, sizeof(Client.room))) {
-        log_error("Could not get client info. Exiting.");
-        return -1;
-    }
+// === GLOBALS ================================================================
+static Client client;
 
-    // connect
-    Client.fd = chat_tcp_connect(ip, port);
-    if (Client.fd < 0) {
-        log_error("Error(setup): Could not set up conection.");
-        return -1;
-    }
-
-    // handshake
-    char handshake[CHAT_USER_NAME_SIZE + CHAT_ROOM_SIZE + 1];
-    snprintf(handshake, sizeof(handshake), "%s:%s", Client.name, Client.room);
-    if (chat_send_all(Client.fd, handshake, strlen(handshake))) {
-        close(Client.fd);
-        return -1;
-    }
-    return Client.fd;
-}
-
-void handle_chat_message(char* payload)
-{
-    clear_current_line();
-    print_chat_message(payload);
-    print_chat_message_prompt(Client.name);
-}
-
-void handle_notify_message(char* buffer)
+// === HELPERS ================================================================
+static void handle_notify_message(char* buffer)
 {
     char* colon = strchr(buffer, ':');
     if (!colon) return;
@@ -65,27 +37,60 @@ void handle_notify_message(char* buffer)
 
     switch ((NotifyCode)code) {
         case NOTIFY_NEW_MSG:
-            handle_chat_message(data);
+            ui_print_chat_message(data);
+            ui_print_chat_message_prompt(client.name);
             break;
         case NOTIFY_ROOM_COUNT:
-            print_room_count(atoi(data));
+            ui_print_room_count(atoi(data));
             break;
         case NOTIFY_USER_JOIN:
-            clear_current_line();
-            print_user_event(data, "joined");
-            print_chat_message_prompt(Client.name);
+            ui_print_user_event(data, "joined");
+            ui_print_chat_message_prompt(client.name);
             break;
         case NOTIFY_USER_LEFT:
-            clear_current_line();
-            print_user_event(data, "left");
-            print_chat_message_prompt(Client.name);
+            ui_print_user_event(data, "left");
+            ui_print_chat_message_prompt(client.name);
+            break;
+        case NOTIFY_HISTORY_MSG:
+            ui_print_chat_history_message(data);
+            ui_print_chat_message_prompt(client.name);
+            break;
+        default:
+            log_error("Unknown notify code: %d", code);
             break;
     }
 }
 
-void chat_run_client(int server_fd)
+// === PUBLIC API =============================================================
+int client_setup(const char *ip, const char *port)
 {
-    char buffer[CHAT_MSG_BUFFER_SIZE];
+    // get user info
+    if (ui_chat_get_input_username(client.name, sizeof(client.name)) ||
+        ui_chat_get_input_room(client.room, sizeof(client.room))) {
+        log_error("Could not get client info. Exiting.");
+        return -1;
+    }
+
+    // connect
+    client.fd = tcp_chat_connect(ip, port);
+    if (client.fd < 0) {
+        log_error("(setup): Could not set up conection.");
+        return -1;
+    }
+
+    // handshake
+    char handshake[CHAT_USER_NAME_SIZE + CHAT_ROOM_SIZE + 1];
+    snprintf(handshake, sizeof(handshake), "%s:%s", client.name, client.room);
+    if (chat_send_all(client.fd, handshake, strlen(handshake))) {
+        close(client.fd);
+        return -1;
+    }
+    return client.fd;
+}
+
+void client_run(int server_fd)
+{
+    char buffer[PAYLOAD_MAX_SIZE];
 
     struct pollfd pfds[2];
     pfds[0].fd = STDIN_FILENO; // watch keyboard input
@@ -93,9 +98,9 @@ void chat_run_client(int server_fd)
     pfds[1].fd = server_fd; // watch server messages
     pfds[1].events = POLLIN;
 
-    print_chat_top_box();
-    print_room_header(Client.room);
-    print_chat_message_prompt(Client.name);
+    ui_print_chat_top_box();
+    ui_print_room_header(client.room);
+    ui_print_chat_message_prompt(client.name);
 
     while (1) {
         int ready = poll(pfds, 2, -1);
@@ -103,7 +108,7 @@ void chat_run_client(int server_fd)
             if (errno == EINTR) {
                 continue;
             }
-            log_error("Error(poll): failed.");
+            log_error("(poll): failed.");
             break;
         }
 
@@ -120,11 +125,11 @@ void chat_run_client(int server_fd)
 
         // keyboard input event
         if (pfds[0].revents & POLLIN) {
-            if (chat_get_input_message(buffer)) {
+            if (ui_chat_get_input_message(buffer)) {
                 break;
             }
             if (strlen(buffer) == 0) {
-                print_chat_message_prompt(Client.name);
+                ui_print_chat_message_prompt(client.name);
                 continue; // empty message - dont send
             }
             if (chat_trap_exit_message(buffer)) {
@@ -133,11 +138,11 @@ void chat_run_client(int server_fd)
             if (chat_send_all(server_fd, buffer, strlen(buffer)) < 0) {
                 break;
             }
-            print_chat_message_prompt(Client.name);
+            ui_print_chat_message_prompt(client.name);
         }
     }
 
-    print_chat_bottom_box();
+    ui_print_chat_bottom_box();
     chat_disconnect(server_fd);
     log_info("Chat ended.");
 }

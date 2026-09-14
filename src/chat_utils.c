@@ -10,7 +10,7 @@
 #include <stddef.h>			// size_t
 #include <sys/types.h>		// ssize_t
 
-int send_bytes(int fd, const char* buffer, size_t len)
+int chat_send_bytes(int fd, const char* buffer, size_t len)
 {
 	size_t sent = 0;
 	while (sent < len) {
@@ -28,12 +28,12 @@ int send_bytes(int fd, const char* buffer, size_t len)
 
 int chat_send_all(const int fd, const char* buffer, size_t len)
 {
-	if (send_bytes(fd, buffer, len) < 0) {
+	if (chat_send_bytes(fd, buffer, len) < 0) {
 		return -1;
 	}
 
 	// new line framing rule
-	return send_bytes(fd, "\n", 1);
+	return chat_send_bytes(fd, "\n", 1);
 }
 
 int chat_recv_all(const int fd, char* buffer, size_t size)
@@ -67,7 +67,7 @@ void chat_disconnect(int fd)
 	}
 }
 
-int validate_room_input(char* input)
+int chat_validate_room_input(char* input)
 {
     int room = atoi(input);
     if (room < 0 || room > CHAT_MAX_ROOMS) {
@@ -89,7 +89,8 @@ int chat_trap_exit_message(const char* msg)
 
 int chat_notify_client(int fd, NotifyCode code, const char* data)
 {
-	char buffer[CHAT_NOTIFY_PAYLOAD_SIZE + CHAT_MSG_BUFFER_SIZE];
+	char buffer[CHAT_NOTIFY_PAYLOAD_SIZE + PAYLOAD_MAX_SIZE];
 	snprintf(buffer, sizeof(buffer), "%d:%s", (int)code, data);
 	return chat_send_all(fd, buffer, strlen(buffer));
 }
+

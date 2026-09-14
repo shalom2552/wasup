@@ -8,53 +8,52 @@
 #include <netdb.h>			// getaddrinfo(), struct addrinfo
 #include <fcntl.h>			// fcntl()
 
-/* iterate address list and bind to first available socket */
-static int bind_to_addrinfo(struct addrinfo* res);
-
-int set_nonblocking(int fd)
+/* set socket to non-blocking */
+static int set_nonblocking(int fd)
 {
-	int flags = fcntl(fd, F_GETFL, 0);
-	if (flags == -1) {
-		return -1;
-	}
-
-	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1) {
         return -1;
     }
 
-	return 0;
+    if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+        return -1;
+    }
+
+    return 0;
 }
 
+/* iterate address list and bind to first available socket */
 static int bind_to_addrinfo(struct addrinfo* res)
 {
-	int sockfd = -1;
-	for (struct addrinfo* rp = res; rp != NULL; rp = rp->ai_next) {
+    int sockfd = -1;
+    for (struct addrinfo* rp = res; rp != NULL; rp = rp->ai_next) {
 
-		sockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-		if (sockfd == -1) {
-			continue; // try next ai
-		}
+        sockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (sockfd == -1) {
+            continue; // try next ai
+        }
 
-		if (set_nonblocking(sockfd) == -1) {
-			log_warn("Warning: Failed to set non-blocking."); // non-fatal
-		}
+        if (set_nonblocking(sockfd) == -1) {
+            log_warn("Failed to set non-blocking."); // non-fatal
+        }
 
-		const int enable = 1;
-		if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) == -1) {
-			log_warn("Warning(socket): Port reuse failed."); // non-fatal
-		}
+        const int enable = 1;
+        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) == -1) {
+            log_warn("Port reuse failed."); // non-fatal
+        }
 
-		if (bind(sockfd, rp->ai_addr, rp->ai_addrlen) == 0) {
-			return sockfd; // success
-		}
+        if (bind(sockfd, rp->ai_addr, rp->ai_addrlen) == 0) {
+            return sockfd; // success
+        }
 
-		close(sockfd);
-		sockfd = -1;
-	}
-	return -1;
+        close(sockfd);
+        sockfd = -1;
+    }
+    return -1;
 }
 
-int chat_tcp_bind(const char* port)
+int tcp_chat_bind(const char* port)
 {
 	struct addrinfo hints;
 	struct addrinfo* res;
@@ -67,14 +66,14 @@ int chat_tcp_bind(const char* port)
 
 	// get address info
 	if (getaddrinfo(NULL, port, &hints, &res)) {
-		log_error("Error(getaddrinfo): Could not get address info.");
+		log_error("Could not get address info.");
 		return -1;
 	}
 
 	int sockfd = bind_to_addrinfo(res);
 
 	if (sockfd == -1) {
-		log_error("Error(bind): Could not bind socket to port.");
+		log_error("(bind): Could not bind socket to port.");
 	}
 
 	// free res
@@ -83,7 +82,7 @@ int chat_tcp_bind(const char* port)
 	return sockfd;
 }
 
-int chat_tcp_accept(int listen_sockfd)
+int tcp_chat_accept(int listen_sockfd)
 {
 	struct sockaddr_storage remote_addr;
 	socklen_t add_size = sizeof(remote_addr);
@@ -93,18 +92,18 @@ int chat_tcp_accept(int listen_sockfd)
 		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			return -2; // no client wating
 		}
-		log_error("Error(accept): Failed to accept connection.");
+		log_error("(accept): Failed to accept connection.");
 		return -1;
 	}
 
 	if (set_nonblocking(client_fd) == -1) {
-		log_warn("Warning: Failed to set non-blocking.");
+		log_warn("Failed to set non-blocking.");
 	}
 
 	return client_fd;
 }
 
-int chat_tcp_connect(const char* host, const char* port)
+int tcp_chat_connect(const char* host, const char* port)
 {
     struct addrinfo hints, *res;
     memset(&hints, 0, sizeof(hints));
@@ -112,7 +111,7 @@ int chat_tcp_connect(const char* host, const char* port)
     hints.ai_socktype = SOCK_STREAM;
 
     if (getaddrinfo(host, port, &hints, &res)) {
-        log_error("Error(getaddrinfo): Could not get address info.");
+        log_error("(getaddrinfo): Could not get address info.");
         return -1;
     }
 
@@ -130,7 +129,7 @@ int chat_tcp_connect(const char* host, const char* port)
     }
 
     if (sockfd == -1) {
-		log_error("Error(connect): Could not connect.");
+		log_error("(connect): Could not connect.");
 	}
 
 	freeaddrinfo(res);
