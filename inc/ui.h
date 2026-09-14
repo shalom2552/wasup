@@ -33,11 +33,17 @@ void print_chat_bottom_box(void);
 /* parse raw string into username and message parts */
 void split_message(char* raw_msg, char** username, char** msg);
 
+/* print given time in specified color */
+void print_time(const char* time, const char* color);
+
 /* print current timestamp with color */
 void print_current_time(const char* color);
 
 /* format and display incoming chat message */
 void print_chat_message(char* raw_msg);
+
+/* format and display history message */
+void print_chat_history_message(char* raw_msg);
 
 /* display interactive input prompt for user */
 void print_chat_message_prompt(const char* username);

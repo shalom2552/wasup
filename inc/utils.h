@@ -1,8 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-/* returns the current time as a string TIME_FMT */
-void utils_get_current_time(char* stime);
+#include <time.h>
+
+/* returns the time as a string TIME_FMT */
+void utils_format_time(time_t t, char* stime);
 
 #endif // !UTILS_H
 

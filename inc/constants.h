@@ -5,6 +5,12 @@
 extern "C" {
 #endif // __cplusplus
 
+#define HISTORY_SIZE       50
+
+#define TIME_FMT "%H:%M:%S"
+#define TIME_SIZE 9
+#define TIMESTAMP_SIZE 20
+
 #define CHAT_VERSION_NO		 "1.4.2"
 #define CHAT_DEFAULT_PORT	 "1313"
 #define CHAT_LOCAL_HOST		 "127.0.0.1"
@@ -16,9 +22,7 @@ extern "C" {
 #define CHAT_MAX_ROOMS              16
 #define CHAT_NOTIFY_PAYLOAD_SIZE    32
 
-#define CHAT_MAX_HISTORY_SIZE       50
-
-#define TIME_FMT "%H:%M:%S"
+#define PAYLOAD_MAX_SIZE (TIMESTAMP_SIZE + 1 + CHAT_USER_NAME_SIZE + 1 + CHAT_MSG_BUFFER_SIZE)
 
 // server notifications type
 typedef enum {

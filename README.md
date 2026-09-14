@@ -18,10 +18,6 @@ A lightweight multi-client TUI chat over TCP, written in C. Supports up to 16 ro
   </tr>
 </table>
 
-## Future
-
-- Chat history: Show previous messages on login.
-
 ## Build
 
 ```sh

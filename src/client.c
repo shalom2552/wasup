@@ -48,13 +48,6 @@ int chat_client_setup(const char *ip, const char *port)
     return Client.fd;
 }
 
-void handle_chat_message(char* payload)
-{
-    clear_current_line();
-    print_chat_message(payload);
-    print_chat_message_prompt(Client.name);
-}
-
 void handle_notify_message(char* buffer)
 {
     char* colon = strchr(buffer, ':');
@@ -65,7 +58,9 @@ void handle_notify_message(char* buffer)
 
     switch ((NotifyCode)code) {
         case NOTIFY_NEW_MSG:
-            handle_chat_message(data);
+            clear_current_line();
+            print_chat_message(data);
+            print_chat_message_prompt(Client.name);
             break;
         case NOTIFY_ROOM_COUNT:
             print_room_count(atoi(data));
@@ -80,12 +75,20 @@ void handle_notify_message(char* buffer)
             print_user_event(data, "left");
             print_chat_message_prompt(Client.name);
             break;
+        case NOTIFY_HISTORY_MSG:
+            clear_current_line();
+            print_chat_history_message(data);
+            print_chat_message_prompt(Client.name);
+            break;
+        default:
+            log_error("Unknown notify code: %d", code);
+            break;
     }
 }
 
 void chat_run_client(int server_fd)
 {
-    char buffer[CHAT_MSG_BUFFER_SIZE];
+    char buffer[PAYLOAD_MAX_SIZE];
 
     struct pollfd pfds[2];
     pfds[0].fd = STDIN_FILENO; // watch keyboard input

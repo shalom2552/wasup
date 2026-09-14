@@ -1,6 +1,7 @@
 #include "server.h"
 #include "chat_utils.h"
 #include "constants.h"
+#include "history.h"
 #include "log.h"
 #include "tcp.h"
 
@@ -17,9 +18,14 @@ typedef struct {
     char name[CHAT_USER_NAME_SIZE];
 } Client;
 
-static Client clients[CHAT_MAX_CLIENTS];
-static int room_count[CHAT_MAX_ROOMS] = {0};
+typedef struct {
+    int room_count;
+    ChatHistory history;
+} Room;
+
 static int client_count = 0;
+static Room rooms[CHAT_MAX_ROOMS];
+static Client clients[CHAT_MAX_CLIENTS];
 
 int chat_server_setup(const char *port)
 {
@@ -33,6 +39,11 @@ int chat_server_setup(const char *port)
         log_error("(listen): Could not listen on socket.");
         close(sockfd);
         return -1;
+    }
+
+    // intilize rooms history
+    for (int room = 0; room < CHAT_MAX_ROOMS; ++room) {
+        history_init(&rooms[room].history, room);
     }
 
     log_info("Server is up!");
@@ -105,8 +116,10 @@ void handle_new_connection(const int listen_fd)
     }
 
     ++client_count;
+    ++rooms[clients[idx].room].room_count;
+    history_notify_client(&rooms[clients[idx].room].history, clients[idx].fd);
     notify_room(clients[idx].room, idx, NOTIFY_USER_JOIN, clients[idx].name);
-    notify_room_users_count(clients[idx].room, ++room_count[clients[idx].room]);
+    notify_room_users_count(clients[idx].room, rooms[clients[idx].room].room_count);
     log_info("<%s> joined room #%d.", clients[idx].name, clients[idx].room);
 }
 
@@ -145,7 +158,7 @@ void handle_client_message(const int idx)
         return;
     }
 
-    // TODO: save message to room history
+    history_update_msg(&rooms[clients[idx].room].history, clients[idx].name, buffer);
     notify_room_new_msg(idx, buffer);
 }
 
@@ -153,12 +166,12 @@ void remove_client(const int idx)
 {
     Client client = clients[idx];
 
-    --room_count[client.room];
+    --rooms[client.room].room_count;
     clients[idx] = clients[--client_count]; // swap-remove
 
     chat_disconnect(client.fd);
     notify_room(client.room, -1, NOTIFY_USER_LEFT, client.name);
-    notify_room_users_count(client.room, room_count[client.room]);
+    notify_room_users_count(client.room, rooms[client.room].room_count);
     log_info("<%s> left room #%d", client.name, client.room);
 }
 

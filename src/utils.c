@@ -4,13 +4,8 @@
 
 #include <time.h>
 
-void utils_get_current_time(char* stime)
+void utils_format_time(time_t t, char* stime)
 {
-	time_t rawtime;
-	struct tm* timeinfo;
-
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-	strftime(stime, sizeof(TIME_FMT), TIME_FMT, timeinfo);
+	strftime(stime, TIME_SIZE, TIME_FMT, localtime(&t));
 }
 

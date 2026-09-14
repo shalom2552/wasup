@@ -89,7 +89,7 @@ int chat_trap_exit_message(const char* msg)
 
 int chat_notify_client(int fd, NotifyCode code, const char* data)
 {
-	char buffer[CHAT_NOTIFY_PAYLOAD_SIZE + CHAT_MSG_BUFFER_SIZE];
+	char buffer[CHAT_NOTIFY_PAYLOAD_SIZE + PAYLOAD_MAX_SIZE];
 	snprintf(buffer, sizeof(buffer), "%d:%s", (int)code, data);
 	return chat_send_all(fd, buffer, strlen(buffer));
 }

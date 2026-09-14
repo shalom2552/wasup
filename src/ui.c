@@ -108,13 +108,17 @@ void split_message(char* raw_msg, char** username, char** msg)
     *msg = colon + 1;
 }
 
+void print_time(const char* time, const char* color)
+{
+    print_chat_left_box();
+    printf("%s[%s]%s ", color, time, C_NC);
+}
+
 void print_current_time(const char* color)
 {
-	char buffer[sizeof(TIME_FMT)];
-    utils_get_current_time(buffer);
-
-	print_chat_left_box();
-	printf("%s[%s]%s ", color, buffer, C_NC);
+	char buffer[TIME_SIZE];
+    utils_format_time(time(NULL), buffer);
+    print_time(buffer, color);
 }
 
 void print_chat_message(char* raw_msg)
@@ -123,6 +127,19 @@ void print_chat_message(char* raw_msg)
 	char* msg;
 	split_message(raw_msg, &username, &msg);
 	print_current_time(C_GRAY);
+	printf("%s%s%s%s: %s\n", C_BOLD, C_GREEN, username, C_NC, msg);
+}
+
+void print_chat_history_message(char* raw_msg)
+{
+	char* timestamp;
+	char* username;
+	char* msg;
+    char timestr[TIME_SIZE];
+	split_message(raw_msg, &timestamp, &username);
+	split_message(username, &username, &msg);
+    utils_format_time((time_t)atoll(timestamp), timestr);
+	print_time(timestr, C_GRAY);
 	printf("%s%s%s%s: %s\n", C_BOLD, C_GREEN, username, C_NC, msg);
 }
 
