@@ -6,15 +6,14 @@
 #include <stdio.h>      // snprintf
 #include <time.h>
 
-void history_init(ChatHistory* history, int room_id)
+void history_init(ChatHistory* history)
 {
-    history->room_id = room_id;
     history->_capacity = HISTORY_SIZE;
     history->_last = -1;
     history->_size = 0;
 }
 
-void history_update_msg(ChatHistory* history, char* name, char* msg)
+void history_save_msg(ChatHistory* history, char* name, char* msg)
 {
     HistoryItem item;
 

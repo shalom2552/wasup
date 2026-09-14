@@ -5,49 +5,32 @@
 #include "log.h"
 
 #include <string.h>     // strcmp()
-#include <signal.h>		// SIGINT
-
-/* setup server and run chat */
-static void start_server(const char* port);
-
-/* connect to server and run chat */
-static void connect_client(const char* ip, const char* port);
 
 int main(int argc, char* argv[])
 {
-	signal(SIGINT, handle_sigint);
-	print_welcome_message();
+	ui_print_welcome_message();
 
 	if (argc > 1 && strcmp(argv[1], "-s") == 0) {
 		const char* port = (argc > 2) ? argv[2] : CHAT_DEFAULT_PORT;
-		start_server(port);
+        int listen_fd = server_setup(port);
+        if (listen_fd < 0) {
+            log_error("Setup failed.");
+            return 1;
+        }
+
+        server_run(listen_fd);
 	} else {
 		const char* ip   = (argc > 1) ? argv[1] : CHAT_LOCAL_HOST;
 		const char* port = (argc > 2) ? argv[2] : CHAT_DEFAULT_PORT;
-		connect_client(ip, port);
+        int server_fd = client_setup(ip, port);
+        if (server_fd < 0) {
+            log_error("Connection failed.");
+            return 1;
+        }
+
+        client_run(server_fd);
 	}
 
 	return 0;
 }
 
-static void start_server(const char* port)
-{
-	int listen_fd = chat_server_setup(port);
-	if (listen_fd < 0) {
-		log_error("Setup failed.");
-		return;
-	}
-
-	chat_run_server(listen_fd);
-}
-
-static void connect_client(const char* ip, const char* port)
-{
-	int server_fd = chat_client_setup(ip, port);
-	if (server_fd < 0) {
-		log_error("Connection failed.");
-		return;
-	}
-
-	chat_run_client(server_fd);
-}

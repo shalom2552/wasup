@@ -19,3 +19,4 @@ void log_msg(LogLevel level, const char* msg, ...);
 #define log_error(...) log_msg(LOG_ERROR, __VA_ARGS__)
 
 #endif // !CHAT_LOG_H
+

@@ -1,19 +1,24 @@
 #ifndef CHAT_CONSTANTS_H
 #define CHAT_CONSTANTS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
+// server notifications type
+typedef enum {
+    NOTIFY_NEW_MSG = 0,
+    NOTIFY_ROOM_COUNT,
+    NOTIFY_USER_JOIN,
+    NOTIFY_USER_LEFT,
+    NOTIFY_HISTORY_MSG
+} NotifyCode;
+
+#define CHAT_VERSION_NO		 "1.4.3"
+#define CHAT_DEFAULT_PORT	 "1313"
+#define CHAT_LOCAL_HOST		 "127.0.0.1"
 
 #define HISTORY_SIZE       50
 
 #define TIME_FMT "%H:%M:%S"
 #define TIME_SIZE 9
 #define TIMESTAMP_SIZE 20
-
-#define CHAT_VERSION_NO		 "1.4.2"
-#define CHAT_DEFAULT_PORT	 "1313"
-#define CHAT_LOCAL_HOST		 "127.0.0.1"
 
 #define CHAT_USER_NAME_SIZE         20
 #define CHAT_MSG_BUFFER_SIZE        2048
@@ -23,15 +28,6 @@ extern "C" {
 #define CHAT_NOTIFY_PAYLOAD_SIZE    32
 
 #define PAYLOAD_MAX_SIZE (TIMESTAMP_SIZE + 1 + CHAT_USER_NAME_SIZE + 1 + CHAT_MSG_BUFFER_SIZE)
-
-// server notifications type
-typedef enum {
-    NOTIFY_NEW_MSG = 0,
-    NOTIFY_ROOM_COUNT,
-    NOTIFY_USER_JOIN,
-    NOTIFY_USER_LEFT,
-    NOTIFY_HISTORY_MSG
-} NotifyCode;
 
 // terminal
 #define ANSI_CLEAR  "\033[H\033[2J\033[3J"	// clear screen
@@ -57,10 +53,6 @@ typedef enum {
 #define CBOX_TPRR  "┓"    					// chat box top right
 #define CBOX_BTLT  "┗"    					// chat box bottom left
 #define CBOX_BTRT  "┛"    					// chat box bottom right
-
-#ifdef __cplusplus
-}
-#endif // __cplusplus
 
 #endif // !CHAT_CONSTANTS_H
 
