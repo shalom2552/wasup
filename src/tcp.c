@@ -36,12 +36,12 @@ static int bind_to_addrinfo(struct addrinfo* res)
 		}
 
 		if (set_nonblocking(sockfd) == -1) {
-			log_warn("Warning: Failed to set non-blocking."); // non-fatal
+			log_warn("Failed to set non-blocking."); // non-fatal
 		}
 
 		const int enable = 1;
 		if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) == -1) {
-			log_warn("Warning(socket): Port reuse failed."); // non-fatal
+			log_warn("Port reuse failed."); // non-fatal
 		}
 
 		if (bind(sockfd, rp->ai_addr, rp->ai_addrlen) == 0) {
@@ -67,14 +67,14 @@ int chat_tcp_bind(const char* port)
 
 	// get address info
 	if (getaddrinfo(NULL, port, &hints, &res)) {
-		log_error("Error(getaddrinfo): Could not get address info.");
+		log_error("Could not get address info.");
 		return -1;
 	}
 
 	int sockfd = bind_to_addrinfo(res);
 
 	if (sockfd == -1) {
-		log_error("Error(bind): Could not bind socket to port.");
+		log_error("(bind): Could not bind socket to port.");
 	}
 
 	// free res
@@ -93,12 +93,12 @@ int chat_tcp_accept(int listen_sockfd)
 		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			return -2; // no client wating
 		}
-		log_error("Error(accept): Failed to accept connection.");
+		log_error("(accept): Failed to accept connection.");
 		return -1;
 	}
 
 	if (set_nonblocking(client_fd) == -1) {
-		log_warn("Warning: Failed to set non-blocking.");
+		log_warn("Failed to set non-blocking.");
 	}
 
 	return client_fd;
@@ -112,7 +112,7 @@ int chat_tcp_connect(const char* host, const char* port)
     hints.ai_socktype = SOCK_STREAM;
 
     if (getaddrinfo(host, port, &hints, &res)) {
-        log_error("Error(getaddrinfo): Could not get address info.");
+        log_error("(getaddrinfo): Could not get address info.");
         return -1;
     }
 
@@ -130,7 +130,7 @@ int chat_tcp_connect(const char* host, const char* port)
     }
 
     if (sockfd == -1) {
-		log_error("Error(connect): Could not connect.");
+		log_error("(connect): Could not connect.");
 	}
 
 	freeaddrinfo(res);

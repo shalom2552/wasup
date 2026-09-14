@@ -34,7 +34,7 @@ int chat_client_setup(const char *ip, const char *port)
     // connect
     Client.fd = chat_tcp_connect(ip, port);
     if (Client.fd < 0) {
-        log_error("Error(setup): Could not set up conection.");
+        log_error("(setup): Could not set up conection.");
         return -1;
     }
 
@@ -103,7 +103,7 @@ void chat_run_client(int server_fd)
             if (errno == EINTR) {
                 continue;
             }
-            log_error("Error(poll): failed.");
+            log_error("(poll): failed.");
             break;
         }
 

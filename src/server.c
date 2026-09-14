@@ -30,7 +30,7 @@ int chat_server_setup(const char *port)
 
     // listen
     if (listen(sockfd, SOMAXCONN) == -1) {
-        log_error("Error(listen): Could not listen on socket.");
+        log_error("(listen): Could not listen on socket.");
         close(sockfd);
         return -1;
     }
@@ -58,7 +58,7 @@ void chat_run_server(const int listen_fd)
             if (errno == EINTR) {
                 continue;   // interupt keep going
             }
-            log_error("Error(poll): failed.");
+            log_error("(poll): failed.");
             break;
         }
 
@@ -92,14 +92,14 @@ void handle_new_connection(const int listen_fd)
     }
 
     if (client_count >= CHAT_MAX_CLIENTS) {
-        log_error("Error(connect): Max clients reached, rejecting.");
+        log_error("(connect): Max clients reached, rejecting.");
         close(fd);
         return;
     }
 
     int idx = client_count;
     if (handle_handshake(fd, idx) == -1) {
-        log_error("Error(handshake): Could not establish connection.");
+        log_error("(handshake): Could not establish connection.");
         close(fd);
         return;
     }
@@ -181,7 +181,7 @@ void notify_room_new_msg(const int from_idx, const char* msg)
     char framed[CHAT_MSG_BUFFER_SIZE + CHAT_USER_NAME_SIZE + 1];
     snprintf(framed, sizeof(framed), "%s:%s", clients[from_idx].name, msg);
     notify_room(clients[from_idx].room, from_idx, NOTIFY_NEW_MSG, framed);
-    log_info("<%s> messaged at room %d", clients[from_idx].name, clients[from_idx].room);
+    log_info("<%s> messaged at room #%d", clients[from_idx].name, clients[from_idx].room);
 }
 
 void notify_room_users_count(const int room, const int count)

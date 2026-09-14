@@ -218,7 +218,7 @@ int get_user_input(const char* label, char* out, size_t size, const char* fallba
 
     // get input
     if (!fgets(out, size, stdin)) {
-        log_error("Error(stdin): System error while reading from stdin.");
+        log_error("System error while reading from stdin.");
         return 1;
     }
 
@@ -232,7 +232,7 @@ int get_user_input(const char* label, char* out, size_t size, const char* fallba
 int chat_get_input_message(char* buffer)
 {
 	if ( !fgets(buffer, CHAT_MSG_BUFFER_SIZE, stdin) ) {
-		log_error("Error(stdin): System error while reading from stdin.");
+		log_error("(stdin): System error while reading from stdin.");
 		return 1;
 	}
 	buffer[strcspn(buffer, "\n")] = 0;
