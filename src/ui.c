@@ -195,10 +195,11 @@ void ui_print_chat_history_message(char* raw_msg)
 	char* msg;
 
     char timestr[TIME_SIZE];
-    time_t t = time(NULL);
 
 	split_message(raw_msg, &timestamp, &username);
 	split_message(username, &username, &msg);
+
+    time_t t = (time_t)strtoll(timestamp, NULL, 10);
 	strftime(timestr, TIME_SIZE, TIME_FMT, localtime(&t));
 
     clear_current_line();
