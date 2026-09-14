@@ -34,7 +34,4 @@ void notify_room_new_msg(const int from_idx, const char* msg);
 /* update all room members with current user count */
 void notify_room_users_count(const int room, const int count);
 
-/* notify room about user joining or leaving */
-void notify_room_user_event(const int room, const int idx, const NotifyCode code);
-
 #endif // !CHAT_SERVER_H

@@ -105,7 +105,7 @@ void handle_new_connection(const int listen_fd)
     }
 
     ++client_count;
-    notify_room_user_event(clients[idx].room, idx, NOTIFY_USER_JOIN);
+    notify_room(clients[idx].room, idx, NOTIFY_USER_JOIN, clients[idx].name);
     notify_room_users_count(clients[idx].room, ++room_count[clients[idx].room]);
     log_info("<%s> joined room #%d.", clients[idx].name, clients[idx].room);
 }
@@ -151,17 +151,15 @@ void handle_client_message(const int idx)
 
 void remove_client(const int idx)
 {
-    int room = clients[idx].room;
-    int client_fd = clients[idx].fd;
-    int new_room_count = --room_count[room];
+    Client client = clients[idx];
 
-    clients[idx] = clients[client_count - 1]; // swap-remove
-    --client_count;
+    --room_count[client.room];
+    clients[idx] = clients[--client_count]; // swap-remove
 
-    chat_disconnect(client_fd);
-    notify_room_user_event(room, idx, NOTIFY_USER_LEFT);
-    notify_room_users_count(room, new_room_count);
-    log_info("<%s> left room #%d", clients[idx].name, clients[idx].room);
+    chat_disconnect(client.fd);
+    notify_room(client.room, -1, NOTIFY_USER_LEFT, client.name);
+    notify_room_users_count(client.room, room_count[client.room]);
+    log_info("<%s> left room #%d", client.name, client.room);
 }
 
 void notify_room(int room, int exclude_idx, NotifyCode code, const char* data)
@@ -192,9 +190,3 @@ void notify_room_users_count(const int room, const int count)
     notify_room(room, -1, NOTIFY_ROOM_COUNT, buffer);
 }
 
-void notify_room_user_event(const int room, const int idx, const NotifyCode code)
-{
-    char buffer[CHAT_NOTIFY_PAYLOAD_SIZE];
-    snprintf(buffer, sizeof(buffer), "%s", clients[idx].name);
-    notify_room(room, idx, code, buffer);
-}
