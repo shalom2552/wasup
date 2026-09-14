@@ -9,12 +9,16 @@ extern "C" {
 #define CHAT_DEFAULT_PORT	 "1313"
 #define CHAT_LOCAL_HOST		 "127.0.0.1"
 
-#define CHAT_USER_NAME_SIZE       20
-#define CHAT_MSG_BUFFER_SIZE      2048
-#define CHAT_MAX_CLIENTS          64
-#define CHAT_ROOM_SIZE            8
-#define CHAT_MAX_ROOMS            16
-#define CHAT_NOTIFY_PAYLOAD_SIZE  32
+#define CHAT_USER_NAME_SIZE         20
+#define CHAT_MSG_BUFFER_SIZE        2048
+#define CHAT_MAX_CLIENTS            64
+#define CHAT_ROOM_SIZE              8
+#define CHAT_MAX_ROOMS              16
+#define CHAT_NOTIFY_PAYLOAD_SIZE    32
+
+#define CHAT_MAX_HISTORY_SIZE       50
+
+#define TIME_FMT "%H:%M:%S"
 
 // server notifications type
 typedef enum {
@@ -22,6 +26,7 @@ typedef enum {
     NOTIFY_ROOM_COUNT,
     NOTIFY_USER_JOIN,
     NOTIFY_USER_LEFT,
+    NOTIFY_HISTORY_MSG
 } NotifyCode;
 
 // terminal

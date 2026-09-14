@@ -2,6 +2,7 @@
 #include "log.h"
 #include "chat_utils.h"
 #include "constants.h"
+#include "utils.h"
 
 #include <stddef.h>		// size_t
 #include <stdio.h>		// printf(), fprintf
@@ -109,13 +110,9 @@ void split_message(char* raw_msg, char** username, char** msg)
 
 void print_current_time(const char* color)
 {
-	char buffer[10];
-	time_t rawtime;
-	struct tm* timeinfo;
+	char buffer[sizeof(TIME_FMT)];
+    utils_get_current_time(buffer);
 
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-	strftime(buffer, sizeof(buffer), "%H:%M:%S", timeinfo);
 	print_chat_left_box();
 	printf("%s[%s]%s ", color, buffer, C_NC);
 }
