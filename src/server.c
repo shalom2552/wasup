@@ -71,16 +71,16 @@ void chat_run_server(const int listen_fd)
 
 void handle_server_events(struct pollfd* pfds, int listen_fd)
 {
-    // listen socket
-    if (pfds[0].revents & POLLIN) {
-        handle_new_connection(listen_fd);
-    }
-
     // clients — iterate backwards because remove_client swaps
     for (int i = client_count - 1; i >= 0; i--) {
         if (pfds[i + 1].revents & (POLLIN | POLLHUP | POLLERR)) {
             handle_client_message(i);
         }
+    }
+
+    // listen socket
+    if (pfds[0].revents & POLLIN) {
+        handle_new_connection(listen_fd);
     }
 }
 
@@ -145,6 +145,7 @@ void handle_client_message(const int idx)
         return;
     }
 
+    // TODO: save message to room history
     notify_room_new_msg(idx, buffer);
 }
 
