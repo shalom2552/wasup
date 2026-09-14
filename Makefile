@@ -1,21 +1,22 @@
 CFLAGS   = -std=c99 -Wall -Wextra -pedantic -g
 CPPFLAGS += -Iinc
 
+BLD 	= build
 SRC_C   = $(wildcard src/*.c)
-OBJ     = $(SRC_C:.c=.o)
+OBJ     = $(SRC_C:%.c=$(BLD)/%.o)
 
 TRG = chat
-OBJ_MAIN = chat.o
 
 all: $(TRG)
 
-$(TRG): $(OBJ_MAIN) $(OBJ)
+$(TRG): $(OBJ)
 	gcc -o $@ $^
 
-%.o: %.c
+$(BLD)/%.o: %.c
+	@mkdir -p $(@D)
 	gcc $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJ) $(TRG) $(OBJ_MAIN)
+	$(RM) -rf $(BLD) $(TRG)
 
 .PHONY: clean all
