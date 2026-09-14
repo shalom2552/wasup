@@ -9,14 +9,12 @@ extern "C" {
 #define CHAT_DEFAULT_PORT	 "1313"
 #define CHAT_LOCAL_HOST		 "127.0.0.1"
 
-enum ChatLimits {
-	CHAT_USER_NAME_SIZE      = 20,
-	CHAT_MSG_BUFFER_SIZE     = 2048,
-	CHAT_MAX_CLIENTS         = 64,
-	CHAT_ROOM_SIZE           = 8,
-	CHAT_MAX_ROOMS           = 16,
-	CHAT_NOTIFY_PAYLOAD_SIZE = 32,
-};
+#define CHAT_USER_NAME_SIZE       20
+#define CHAT_MSG_BUFFER_SIZE      2048
+#define CHAT_MAX_CLIENTS          64
+#define CHAT_ROOM_SIZE            8
+#define CHAT_MAX_ROOMS            16
+#define CHAT_NOTIFY_PAYLOAD_SIZE  32
 
 // server notifications type
 typedef enum {
