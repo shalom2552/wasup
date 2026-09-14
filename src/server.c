@@ -26,7 +26,7 @@ typedef struct {
 
 // === GLOBALS ================================================================
 static int client_count = 0;
-static Room rooms[CHAT_MAX_ROOMS];
+static Room rooms[CHAT_MAX_ROOMS + 1];
 static Client clients[CHAT_MAX_CLIENTS];
 
 // === HELPERS ================================================================
@@ -169,7 +169,7 @@ int server_setup(const char *port)
     }
 
     // intilize rooms history
-    for (int room = 0; room < CHAT_MAX_ROOMS; ++room) {
+    for (int room = 0; room <= CHAT_MAX_ROOMS; ++room) {
         history_init(&rooms[room].history);
     }
 
