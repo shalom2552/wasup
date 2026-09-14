@@ -181,6 +181,7 @@ void notify_room_new_msg(const int from_idx, const char* msg)
     char framed[CHAT_MSG_BUFFER_SIZE + CHAT_USER_NAME_SIZE + 1];
     snprintf(framed, sizeof(framed), "%s:%s", clients[from_idx].name, msg);
     notify_room(clients[from_idx].room, from_idx, NOTIFY_NEW_MSG, framed);
+    log_info("<%s> messaged at room %d", clients[from_idx].name, clients[from_idx].room);
 }
 
 void notify_room_users_count(const int room, const int count)
